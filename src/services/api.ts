@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { Paper, User, ApiResponse, UploadProgress } from '../types';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://epaper-l48b.onrender.com';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -207,5 +207,6 @@ export const contactAPI = {
     return response.data;
   },
 };
+
 
 export default api;
