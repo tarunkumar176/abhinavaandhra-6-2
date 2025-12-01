@@ -45,9 +45,9 @@ app.use(
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
-        frameSrc: ["'self'", "http://localhost:3000"],
-        frameAncestors: ["'self'", "http://localhost:3000"],
-        imgSrc: ["'self'", "data:"],
+        frameSrc: ["'self'", "http://localhost:3000", "https://epaper-page.onrender.com"],
+        frameAncestors: ["'self'", "http://localhost:3000", "https://epaper-page.onrender.com"],
+        imgSrc: ["'self'", "data:", "https://epaper-page.onrender.com"],
         scriptSrc: ["'self'"],
         styleSrc: ["'self'", "'unsafe-inline'", "https:"],
       },
@@ -66,7 +66,11 @@ app.use('/api/', limiter);
 // 🌐 CORS
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    origin: [
+      'http://localhost:3000',
+      'https://epaper-page.onrender.com',
+      process.env.FRONTEND_URL
+    ].filter(Boolean),
     credentials: true,
   })
 );
@@ -81,7 +85,11 @@ await fs.ensureDir(uploadsDir);
 
 // 🖼️ Serve uploaded files with proper CORS headers
 app.use('/uploads', (req, res, next) => {
-  res.header('Access-Control-Allow-Origin', process.env.FRONTEND_URL || 'http://localhost:3000');
+  const allowedOrigins = ['http://localhost:3000', 'https://epaper-page.onrender.com', process.env.FRONTEND_URL].filter(Boolean);
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin);
+  }
   res.header('Access-Control-Allow-Methods', 'GET');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
   res.header('Cross-Origin-Resource-Policy', 'cross-origin');
