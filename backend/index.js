@@ -68,7 +68,7 @@ app.use(
   cors({
     origin: [
       'http://localhost:3000',
-      'https://epaper-page.onrender.com',
+      'https://epapera0.vercel.app',
       'https://epaper-front.onrender.com',
       process.env.FRONTEND_URL
     ].filter(Boolean),
