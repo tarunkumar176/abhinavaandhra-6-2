@@ -8,8 +8,9 @@
     "build": "vite build",
     "preview": "vite preview",
     "server": "node server/index.js",
-    "start": "vite build && vite preview",
-    "deploy": "npm run build"
+    "start": "node server/index.js",
+    "deploy": "npm run build",
+    "postinstall": "cd server && npm install"
   },
   "dependencies": {
     "@react-pdf-viewer/core": "^3.12.0",

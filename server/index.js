@@ -8,8 +8,11 @@ import { fileURLToPath } from 'url';
 import fs from 'fs-extra';
 import cron from 'node-cron';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 // Load environment variables first
-dotenv.config();
+dotenv.config({ path: path.join(__dirname, '.env') });
 
 if (!process.env.JWT_SECRET) {
   console.error('FATAL ERROR: JWT_SECRET is not defined in .env file');
@@ -29,8 +32,7 @@ import breakingNewsRoutes from './routes/breakingNews.js';
 import { cleanupOldPapers } from './services/cleanup.js';
 
 // ES6 module path fix
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// __filename and __dirname are already defined above
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -127,13 +129,31 @@ app.use((err, req, res, next) => {
   });
 });
 
-// 🧭 404 Handler
-app.use('*', (req, res) => {
-  res.status(404).json({
-    success: false,
-    message: 'Route not found',
+// 🧭 404 Handler & SPA Fallback
+// Serve static files from the React app
+const distPath = path.join(__dirname, '../dist');
+if (fs.existsSync(distPath)) {
+  app.use(express.static(distPath));
+
+  // Handle SPA routing - serve index.html for any unknown routes not starting with /api
+  app.get('*', (req, res) => {
+    if (req.path.startsWith('/api')) {
+      return res.status(404).json({
+        success: false,
+        message: 'API route not found',
+      });
+    }
+    res.sendFile(path.join(distPath, 'index.html'));
   });
-});
+} else {
+  // Fallback for when dist doesn't exist (e.g. local dev without build)
+  app.use('*', (req, res) => {
+    res.status(404).json({
+      success: false,
+      message: 'Route not found',
+    });
+  });
+}
 
 // 🕑 Daily Cleanup Job
 cron.schedule('0 2 * * *', async () => {
