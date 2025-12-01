@@ -45,9 +45,9 @@ app.use(
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
-        frameSrc: ["'self'", "http://localhost:3000", "https://epaper-page.onrender.com"],
-        frameAncestors: ["'self'", "http://localhost:3000", "https://epaper-page.onrender.com"],
-        imgSrc: ["'self'", "data:", "https://epaper-page.onrender.com"],
+        frameSrc: ["'self'", "http://localhost:3000", "https://epaper-page.onrender.com", "https://epaper-front.onrender.com"],
+        frameAncestors: ["'self'", "http://localhost:3000", "https://epaper-page.onrender.com", "https://epaper-front.onrender.com"],
+        imgSrc: ["'self'", "data:", "https://epaper-page.onrender.com", "https://epaper-front.onrender.com"],
         scriptSrc: ["'self'"],
         styleSrc: ["'self'", "'unsafe-inline'", "https:"],
       },
@@ -69,6 +69,7 @@ app.use(
     origin: [
       'http://localhost:3000',
       'https://epaper-page.onrender.com',
+      'https://epaper-front.onrender.com',
       process.env.FRONTEND_URL
     ].filter(Boolean),
     credentials: true,
@@ -85,7 +86,7 @@ await fs.ensureDir(uploadsDir);
 
 // 🖼️ Serve uploaded files with proper CORS headers
 app.use('/uploads', (req, res, next) => {
-  const allowedOrigins = ['http://localhost:3000', 'https://epaper-page.onrender.com', process.env.FRONTEND_URL].filter(Boolean);
+  const allowedOrigins = ['http://localhost:3000', 'https://epaper-page.onrender.com', 'https://epaper-front.onrender.com', process.env.FRONTEND_URL].filter(Boolean);
   const origin = req.headers.origin;
   if (allowedOrigins.includes(origin)) {
     res.header('Access-Control-Allow-Origin', origin);
