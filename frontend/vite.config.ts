@@ -11,7 +11,7 @@ export default defineConfig(({ mode }) => {
         historyApiFallback: true,
         proxy: {
           '/uploads': {
-            target: 'https://epaper-1bys.vercel.app',
+            target: 'https://abhinavandhra-backend.onrender.com',
             changeOrigin: true,
           }
         }
