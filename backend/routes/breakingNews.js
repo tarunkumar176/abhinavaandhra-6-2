@@ -1,18 +1,13 @@
 import express from 'express';
+import { query } from '../config/db.js';
 import { authenticateToken, requireAdmin } from '../middleware/auth.js';
-
-// Import database configuration based on DB_TYPE
-const dbType = process.env.DB_TYPE || 'sqlite';
-const { query } = dbType === 'sqlite'
-    ? await import('../config/database-sqlite.js')
-    : await import('../config/database.js');
 
 const router = express.Router();
 
 // Get active breaking news (public)
 router.get('/', async (req, res) => {
     try {
-        const result = await query('SELECT * FROM breaking_news WHERE is_active = 1 ORDER BY created_at DESC');
+        const result = await query('SELECT * FROM breaking_news WHERE is_active = ? ORDER BY created_at DESC', [true]);
         res.json({
             success: true,
             data: result.rows
@@ -33,16 +28,16 @@ router.post('/', authenticateToken, requireAdmin, async (req, res) => {
         }
 
         const result = await query(
-            'INSERT INTO breaking_news (content, is_active, created_at, updated_at) VALUES (?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)',
-            [content, is_active ? 1 : 0]
+            'INSERT INTO breaking_news (content, is_active, created_at, updated_at) VALUES (?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP) RETURNING id',
+            [content, is_active ? true : false]
         );
 
         res.json({
             success: true,
             data: {
-                id: result.lastID,
+                id: result.rows[0]?.id || result.lastID,
                 content,
-                is_active: is_active ? 1 : 0
+                is_active: is_active ? true : false
             },
             message: 'Breaking news updated successfully'
         });

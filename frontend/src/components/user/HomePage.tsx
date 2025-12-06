@@ -30,6 +30,12 @@ const HomePage: React.FC = () => {
     }
   };
 
+  const handleNavigateToPaper = () => {
+    if (todaysPaper) {
+      navigate(`/paper/${todaysPaper.date}`);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -39,87 +45,103 @@ const HomePage: React.FC = () => {
   }
 
   return (
-    <div className="space-y-8">
-      {/* Hero Section - Today's Edition */}
-      <div 
-        className="relative rounded-lg overflow-hidden text-white"
-        style={{
-          backgroundImage: todaysPaper?.thumbnailUrl 
-            ? `url('${todaysPaper.thumbnailUrl}')`
-            : 'linear-gradient(to right, var(--color-primary), var(--color-secondary))',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
-      >
-        {/* Overlay */}
-        <div className="absolute inset-0 bg-black/40"></div>
-        
-        {/* Content */}
-        <div className="relative z-10 p-8">
-          <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 sm:mb-6">
-              తెలుగు ఈ-పేపర్
-            </h1>
-            <p className="text-lg sm:text-xl md:text-2xl mb-6 sm:mb-8 opacity-90">
-              Today's Digital Edition
-            </p>
-
-            {todaysPaper ? (
-              <div className="space-y-4 sm:space-y-6">
-                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 sm:p-6 md:p-8">
-                  <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2">{todaysPaper.title}</h2>
-                  <p className="text-lg sm:text-xl md:text-2xl opacity-90 mb-3 sm:mb-4">
-                    {formatDisplayDate(todaysPaper.date)}
-                  </p>
-                  <div className="flex justify-center items-center flex-wrap gap-4 text-xs sm:text-sm md:text-base opacity-80">
-                    <span>📄 {todaysPaper.pageCount} Pages</span>
-                    <span>📁 {(todaysPaper.fileSize / (1024 * 1024)).toFixed(1)} MB</span>
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+        {/* Today's Paper Card */}
+        {todaysPaper ? (
+          <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden mb-12">
+            <div className="grid md:grid-cols-2 gap-8 p-8 sm:p-12">
+              {/* Left: Paper Preview - Clickable */}
+              <div 
+                className="flex items-center justify-center cursor-pointer group"
+                onClick={handleNavigateToPaper}
+              >
+                {todaysPaper.thumbnailUrl ? (
+                  <img 
+                    src={todaysPaper.thumbnailUrl} 
+                    alt={todaysPaper.title}
+                    className="w-full h-auto object-contain shadow-xl transition-transform duration-300 group-hover:scale-[1.02]"
+                  />
+                ) : (
+                  <div className="flex flex-col items-center justify-center h-96 w-full bg-gray-100 rounded-lg">
+                    <FileText className="h-24 w-24 text-gray-400 mb-4" />
+                    <p className="text-gray-500 font-medium">Today's Edition</p>
                   </div>
+                )}
+              </div>
+
+              {/* Right: Paper Details */}
+              <div className="flex flex-col justify-center">
+                <div className="flex items-center gap-2 mb-6">
+                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                  <span className="text-green-700 font-semibold text-sm uppercase tracking-wide">Available Now</span>
                 </div>
+
+                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-3 leading-tight">
+                  {todaysPaper.title}
+                </h2>
+                
+                <p className="text-xl text-gray-600 mb-8">
+                  {formatDisplayDate(todaysPaper.date)}
+                </p>
 
                 <button
-                  onClick={() => navigate(`/paper/${todaysPaper.date}`)}
-                  className="inline-flex items-center gap-2 sm:gap-3 bg-white text-telugu-primary px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-bold text-base sm:text-lg hover:bg-gray-100 transition-colors shadow-lg hover:shadow-xl active:scale-95"
+                  onClick={handleNavigateToPaper}
+                  className="w-full inline-flex items-center justify-center gap-3 bg-gray-900 text-white px-8 py-5 rounded-lg font-bold text-lg hover:bg-gray-800 transition-all shadow-md hover:shadow-lg active:scale-[0.98]"
                 >
-                  <FileText className="h-5 w-5 sm:h-6 sm:w-6" />
+                  <FileText className="h-6 w-6" />
                   <span>Read Today's Paper</span>
-                  <ArrowRight className="h-5 w-5 sm:h-6 sm:w-6" />
+                  <ArrowRight className="h-6 w-6" />
                 </button>
               </div>
-            ) : (
-              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 sm:p-8 md:p-10">
-                <FileText className="h-12 w-12 sm:h-16 sm:w-16 mx-auto mb-3 sm:mb-4 opacity-60" />
-                <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-2">Today's Paper</h2>
-                <p className="text-base sm:text-lg opacity-90 mb-4 sm:mb-6">
-                  Today's edition is not available yet. Please check back later.
-                </p>
-                <p className="text-xs sm:text-sm opacity-75 mb-4 sm:mb-6">
-                  Papers are usually uploaded by 6:00 AM daily
-                </p>
-                <div className="text-center">
-                  <button
-                    onClick={() => navigate(`/paper/${getTodayDate()}`)}
-                    className="inline-flex items-center gap-2 bg-white/90 text-telugu-primary px-5 sm:px-6 py-2 sm:py-3 rounded-lg font-bold text-sm sm:text-base hover:bg-gray-100 transition-colors shadow hover:shadow-md active:scale-95"
-                  >
-                    <FileText className="h-4 w-4 sm:h-5 sm:w-5" />
-                    <span>Open Today's Paper</span>
-                  </button>
-                </div>
+            </div>
+          </div>
+        ) : (
+          <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-8 sm:p-12 mb-12 text-center">
+            <div className="max-w-md mx-auto">
+              <FileText className="h-16 w-16 mx-auto mb-6 text-gray-400" />
+              
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
+                Today's Paper Not Yet Available
+              </h2>
+              
+              <p className="text-lg text-gray-600 mb-8">
+                Our team is preparing today's edition. New papers are typically published by 6:00 AM each morning.
+              </p>
+
+              <div className="flex items-center justify-center gap-2 text-sm text-gray-500 mb-8">
+                <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse"></div>
+                <span>Check back soon</span>
               </div>
-            )}
+              
+              <Link
+                to="/archive"
+                className="inline-flex items-center gap-2 text-gray-900 hover:text-gray-700 font-semibold text-base border-b-2 border-gray-900 hover:border-gray-700 transition-colors pb-1"
+              >
+                <span>Browse Previous Editions</span>
+                <ArrowRight className="h-5 w-5" />
+              </Link>
+            </div>
+          </div>
+        )}
+
+        {/* Quick Stats */}
+        <div className="grid sm:grid-cols-3 gap-6">
+          <div className="bg-white rounded-lg border border-gray-200 p-6">
+            <div className="text-gray-900 font-bold text-lg mb-2">📱 Multi-Device</div>
+            <p className="text-gray-600 text-sm">Access on phone, tablet, or computer</p>
+          </div>
+          
+          <div className="bg-white rounded-lg border border-gray-200 p-6">
+            <div className="text-gray-900 font-bold text-lg mb-2">🗂️ Full Archive</div>
+            <p className="text-gray-600 text-sm">Browse and read past editions anytime</p>
+          </div>
+          
+          <div className="bg-white rounded-lg border border-gray-200 p-6">
+            <div className="text-gray-900 font-bold text-lg mb-2">⚡ Daily Updates</div>
+            <p className="text-gray-600 text-sm">Fresh content every morning by 6 AM</p>
           </div>
         </div>
-      </div>
-
-      {/* Welcome Message */}
-      <div className="text-center py-8 sm:py-12 md:py-16 px-4">
-        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-3 sm:mb-4">
-          Welcome to Telugu Digital Newspaper
-        </h2>
-        <p className="text-base sm:text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">
-          Stay updated with the latest Telugu news, delivered digitally.
-          Access today's edition and browse through previous days with ease.
-        </p>
       </div>
     </div>
   );

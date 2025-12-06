@@ -48,7 +48,7 @@ export async function initializeDatabase() {
     await client.query(`
       CREATE TABLE IF NOT EXISTS papers (
         id SERIAL PRIMARY KEY,
-        date DATE UNIQUE NOT NULL,
+        date VARCHAR(10) UNIQUE NOT NULL,
         title VARCHAR(255) NOT NULL,
         filename VARCHAR(255) NOT NULL,
         file_path VARCHAR(500) NOT NULL,
@@ -56,6 +56,18 @@ export async function initializeDatabase() {
         file_size BIGINT NOT NULL,
         page_count INTEGER NOT NULL,
         upload_timestamp BIGINT NOT NULL,
+        thumbnail_url VARCHAR(500),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    // Create breaking_news table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS breaking_news (
+        id SERIAL PRIMARY KEY,
+        content TEXT NOT NULL,
+        is_active BOOLEAN DEFAULT true,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
@@ -71,7 +83,7 @@ export async function initializeDatabase() {
     `);
 
     // Create default admin user if it doesn't exist
-    const adminEmail = process.env.ADMIN_EMAIL || 'admin@teluguepaper.com';
+    const adminEmail = process.env.DB_EMAIL || 'admin@teluguepaper.com';
     const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
     
     const existingAdmin = await client.query(
@@ -97,15 +109,25 @@ export async function initializeDatabase() {
   }
 }
 
-// Helper function to execute queries
-export async function query(text, params) {
+// Helper function to execute queries - converts SQLite syntax to PostgreSQL
+export async function query(text, params = []) {
   const start = Date.now();
-  const res = await pool.query(text, params);
+  
+  // Convert SQLite ? placeholders to PostgreSQL $1, $2, etc.
+  let paramIndex = 1;
+  const convertedText = text.replace(/\?/g, () => '$' + (paramIndex++));
+  
+  const res = await pool.query(convertedText, params);
   const duration = Date.now() - start;
   
   if (process.env.NODE_ENV === 'development') {
-    console.log('Executed query', { text, duration, rows: res.rowCount });
+    console.log('Executed query', { text: convertedText, duration, rows: res.rowCount });
   }
   
-  return res;
+  // Return in SQLite-compatible format
+  return {
+    rows: res.rows,
+    lastID: res.rows[0]?.id,
+    changes: res.rowCount
+  };
 }

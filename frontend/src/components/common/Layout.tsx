@@ -191,10 +191,10 @@ const Layout: React.FC<LayoutProps> = ({ children, isAdmin = false }) => {
               <div className="flex items-center space-x-3 mb-4">
                 <img
                   src="/logo.jpg"
-                  alt="Telugu E-Paper Logo"
+                  alt=" Logo"
                   className="h-10 w-auto object-contain"
                 />
-                <h3 className="text-xl font-bold">తెలుగు ఈ-పేపర్</h3>
+                
               </div>
               <p className="text-gray-300 mb-4">
                 The largest circulated Telugu daily newspaper, now available digitally.
@@ -230,12 +230,9 @@ const Layout: React.FC<LayoutProps> = ({ children, isAdmin = false }) => {
 
           {/* Bottom Footer */}
           <div className="border-t border-gray-700 mt-8 pt-8">
-            <div className="flex flex-col md:flex-row justify-between items-center">
+            <div className="flex flex-col md:flex-row justify-center items-center">
               <div className="text-sm text-gray-400">
-                <p>&copy; 2025 Telugu E-Paper. All rights reserved.</p>
-              </div>
-              <div className="text-sm text-gray-400 mt-4 md:mt-0">
-                <p>Built with React, Node.js, and SQLite</p>
+                <p>&copy; 2025 Abhinavandhra. All rights reserved.</p>
               </div>
             </div>
           </div>

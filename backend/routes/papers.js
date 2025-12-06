@@ -2,17 +2,22 @@ import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs-extra';
-// Import database configuration based on DB_TYPE
-const dbType = process.env.DB_TYPE || 'sqlite';
-const { query } = dbType === 'sqlite'
-    ? await import('../config/database-sqlite.js')
-    : await import('../config/database.js');
+import { query } from '../config/db.js';
 import { authenticateToken, requireAdmin } from '../middleware/auth.js';
 import { upload, handleUploadError } from '../middleware/upload.js';
 
 const router = express.Router();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// Helper function to format date consistently
+const formatDate = (date) => {
+    if (!date) return null;
+    if (date instanceof Date) {
+        return date.toISOString().split('T')[0];
+    }
+    return date;
+};
 
 // Get all papers (public)
 router.get('/', async (req, res) => {
@@ -32,13 +37,13 @@ router.get('/', async (req, res) => {
                 date: row.date,
                 title: row.title,
                 filename: row.filename,
-                pdfUrl: row.file_url ? row.file_url.replace(/^http:/, 'https:') : null,
+                pdfUrl: row.file_url,
                 fileSize: parseInt(row.file_size),
                 pageCount: row.page_count,
                 uploadTimestamp: parseInt(row.upload_timestamp),
                 createdAt: row.created_at,
                 updatedAt: row.updated_at,
-                thumbnailUrl: row.thumbnail_url ? row.thumbnail_url.replace(/^http:/, 'https:') : null
+                thumbnailUrl: row.thumbnail_url
             }))
         });
     } catch (error) {
@@ -85,13 +90,13 @@ router.get('/:date', async (req, res) => {
                 date: row.date,
                 title: row.title,
                 filename: row.filename,
-                pdfUrl: row.file_url ? row.file_url.replace(/^http:/, 'https:') : null,
+                pdfUrl: row.file_url,
                 fileSize: parseInt(row.file_size),
                 pageCount: row.page_count,
                 uploadTimestamp: parseInt(row.upload_timestamp),
                 createdAt: row.created_at,
                 updatedAt: row.updated_at,
-                thumbnailUrl: row.thumbnail_url ? row.thumbnail_url.replace(/^http:/, 'https:') : null
+                thumbnailUrl: row.thumbnail_url
             }
         });
     } catch (error) {
@@ -120,7 +125,7 @@ router.get('/recent/:days', async (req, res) => {
         id, date, title, filename, file_url, file_size, 
         page_count, upload_timestamp, created_at, updated_at, thumbnail_url
       FROM papers 
-      WHERE date >= date('now', '-${days} days')
+      WHERE date >= CURRENT_DATE - INTERVAL '${days} days'
       ORDER BY date DESC
     `);
 
@@ -131,13 +136,13 @@ router.get('/recent/:days', async (req, res) => {
                 date: row.date,
                 title: row.title,
                 filename: row.filename,
-                pdfUrl: row.file_url ? row.file_url.replace(/^http:/, 'https:') : null,
+                pdfUrl: row.file_url,
                 fileSize: parseInt(row.file_size),
                 pageCount: row.page_count,
                 uploadTimestamp: parseInt(row.upload_timestamp),
                 createdAt: row.created_at,
                 updatedAt: row.updated_at,
-                thumbnailUrl: row.thumbnail_url ? row.thumbnail_url.replace(/^http:/, 'https:') : null
+                thumbnailUrl: row.thumbnail_url
             }))
         });
     } catch (error) {
@@ -311,6 +316,7 @@ router.post('/upload',
           date, title, filename, file_path, file_url, 
           file_size, page_count, upload_timestamp, thumbnail_url
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        RETURNING id
       `, [
                 date,
                 title,
@@ -323,12 +329,14 @@ router.post('/upload',
                 thumbnailUrl
             ]);
 
+            const insertedId = result.rows[0]?.id || result.lastID;
+
             console.log('Paper uploaded successfully:', { date, title, pdfFileUrl, thumbnailUrl });
 
             res.status(201).json({
                 success: true,
                 data: {
-                    id: result.lastID.toString(),
+                    id: insertedId.toString(),
                     date: date,
                     title: title,
                     filename: pdfFile.originalname,

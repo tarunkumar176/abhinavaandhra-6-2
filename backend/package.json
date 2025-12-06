@@ -8,7 +8,9 @@
     "start": "node index.js",
     "dev": "nodemon index.js",
     "build": "echo 'Server build complete'",
-    "vercel-build": "echo 'Vercel build complete'"
+    "vercel-build": "echo 'Vercel build complete'",
+    "migrate:postgres": "node scripts/migrate-postgres.js",
+    "test:postgres": "node test-postgres.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

@@ -79,12 +79,42 @@ const PaperView: React.FC = () => {
   const renderPdfToImages = async (pdfUrl: string) => {
     try {
       setPdfLoading(true);
-      const pdf = await pdfjsLib.getDocument(pdfUrl).promise;
+      // Convert absolute URL to relative for local proxy
+      const url = pdfUrl.replace('http://localhost:5000', '');
+      const pdf = await pdfjsLib.getDocument({
+        url: url,
+        cMapUrl: `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/cmaps/`,
+        cMapPacked: true,
+      }).promise;
+      
+      // Only render first page initially for faster loading
       const images: string[] = [];
+      const page = await pdf.getPage(1);
+      const viewport = page.getViewport({ scale: 1.5 }); // Reduced scale for faster loading
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
 
-      for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+      if (context) {
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+
+        await page.render({
+          canvasContext: context,
+          viewport: viewport,
+        }).promise;
+
+        images.push(canvas.toDataURL('image/jpeg', 0.9)); // Use JPEG for smaller size
+      }
+
+      // Render remaining pages in background
+      setPageImages(images);
+      setCurrentPage(0);
+      setPdfLoading(false);
+
+      // Load other pages in background
+      for (let pageNum = 2; pageNum <= pdf.numPages; pageNum++) {
         const page = await pdf.getPage(pageNum);
-        const viewport = page.getViewport({ scale: 2 }); // 2x scale for better quality
+        const viewport = page.getViewport({ scale: 1.5 });
         const canvas = document.createElement('canvas');
         const context = canvas.getContext('2d');
 
@@ -98,15 +128,12 @@ const PaperView: React.FC = () => {
           viewport: viewport,
         }).promise;
 
-        images.push(canvas.toDataURL('image/png'));
+        images.push(canvas.toDataURL('image/jpeg', 0.9));
+        setPageImages([...images]); // Update state as pages load
       }
-
-      setPageImages(images);
-      setCurrentPage(0);
     } catch (error) {
       console.error('Error rendering PDF:', error);
       toast.error('Failed to render PDF pages');
-    } finally {
       setPdfLoading(false);
     }
   };
@@ -289,9 +316,9 @@ const PaperView: React.FC = () => {
           </div>
         </div>
 
-        {/* Page Display - Responsive Heights */}
+        {/* Page Display - White Background */}
         <div
-          className="relative flex justify-center items-center bg-gray-900 rounded-lg p-2 sm:p-3 md:p-4 group"
+          className="relative flex justify-center items-center bg-white rounded-lg p-2 sm:p-3 md:p-4 group"
           style={{
             minHeight: 'clamp(300px, 60vh, 900px)',
           }}
@@ -300,7 +327,7 @@ const PaperView: React.FC = () => {
           <button
             onClick={goToPreviousPage}
             disabled={currentPage === 0}
-            className="fixed left-2 sm:left-4 text-white p-2 sm:p-3 rounded-full transition z-10 bg-black/60 hover:bg-black/80 disabled:bg-black/30 disabled:cursor-not-allowed"
+            className="fixed left-2 sm:left-4 text-gray-700 p-2 sm:p-3 rounded-full transition z-10 bg-gray-200/80 hover:bg-gray-300/90 disabled:bg-gray-100/50 disabled:cursor-not-allowed shadow-md"
             style={{
               top: '50%',
               transform: 'translateY(-50%)',
@@ -314,7 +341,7 @@ const PaperView: React.FC = () => {
           <button
             onClick={goToNextPage}
             disabled={currentPage >= pageImages.length - 1}
-            className="fixed right-2 sm:right-4 text-white p-2 sm:p-3 rounded-full transition z-10 bg-black/60 hover:bg-black/80 disabled:bg-black/30 disabled:cursor-not-allowed"
+            className="fixed right-2 sm:right-4 text-gray-700 p-2 sm:p-3 rounded-full transition z-10 bg-gray-200/80 hover:bg-gray-300/90 disabled:bg-gray-100/50 disabled:cursor-not-allowed shadow-md"
             style={{
               top: '50%',
               transform: 'translateY(-50%)',
@@ -326,7 +353,7 @@ const PaperView: React.FC = () => {
 
           {pdfLoading ? (
             <div className="flex items-center justify-center h-64 sm:h-96">
-              <div className="animate-spin rounded-full h-8 w-8 sm:h-12 sm:w-12 border-b-2 border-white"></div>
+              <div className="animate-spin rounded-full h-8 w-8 sm:h-12 sm:w-12 border-b-2 border-telugu-primary"></div>
             </div>
           ) : pageImages.length > 0 ? (
             cropMode ? (

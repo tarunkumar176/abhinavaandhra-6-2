@@ -20,11 +20,7 @@ if (!process.env.JWT_SECRET) {
 }
 
 // Import database configuration
-const dbType = process.env.DB_TYPE || 'sqlite';
-const { initializeDatabase } =
-  dbType === 'sqlite'
-    ? await import('./config/database-sqlite.js')
-    : await import('./config/database.js');
+import { initializeDatabase } from './config/db.js';
 
 import authRoutes from './routes/auth.js';
 import paperRoutes from './routes/papers.js';

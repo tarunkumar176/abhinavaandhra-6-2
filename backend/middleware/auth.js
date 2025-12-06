@@ -1,9 +1,5 @@
 import jwt from 'jsonwebtoken';
-// Import database configuration based on DB_TYPE
-const dbType = process.env.DB_TYPE || 'sqlite';
-const { query } = dbType === 'sqlite' 
-  ? await import('../config/database-sqlite.js')
-  : await import('../config/database.js');
+import { query } from '../config/db.js';
 
 export const authenticateToken = async (req, res, next) => {
   const authHeader = req.headers['authorization'];

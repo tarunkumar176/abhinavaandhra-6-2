@@ -127,7 +127,7 @@ const AdminDashboard: React.FC = () => {
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
           <p className="text-gray-600 mt-1">
-            Manage your Telugu E-Paper uploads and editions
+            Manage your E-Paper uploads and editions
           </p>
         </div>
 
@@ -267,7 +267,7 @@ const AdminDashboard: React.FC = () => {
             <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">No Papers Uploaded</h3>
             <p className="text-gray-600 mb-4">
-              Start by uploading your first Telugu newspaper edition.
+              Start by uploading your first Abhinavandhra newspaper edition.
             </p>
             <Link to="/admin/upload" className="btn-primary inline-flex items-center">
               <Upload className="h-4 w-4 mr-2" />
