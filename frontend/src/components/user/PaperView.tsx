@@ -79,10 +79,9 @@ const PaperView: React.FC = () => {
   const renderPdfToImages = async (pdfUrl: string) => {
     try {
       setPdfLoading(true);
-      // Convert absolute URL to relative for local proxy
-      const url = pdfUrl.replace('http://localhost:5000', '');
+      // Use the PDF URL directly (works for both local and production)
       const pdf = await pdfjsLib.getDocument({
-        url: url,
+        url: pdfUrl,
         cMapUrl: `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/cmaps/`,
         cMapPacked: true,
       }).promise;
