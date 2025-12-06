@@ -152,18 +152,18 @@ const Layout: React.FC<LayoutProps> = ({ children, isAdmin = false }) => {
               </nav>
 
               {/* Right Navigation */}
-              <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2 sm:space-x-4">
                 {isAuthenticated && (
                   <>
-                    <span className="text-sm text-gray-600">
-                      Welcome, {user?.email}
+                    <span className="text-xs sm:text-sm text-gray-600 truncate max-w-[120px] sm:max-w-none">
+                      {user?.email}
                     </span>
                     <button
                       onClick={handleLogout}
-                      className="flex items-center space-x-1 px-3 py-1 text-red-600 hover:text-red-700 hover:bg-red-50 rounded text-sm"
+                      className="flex items-center space-x-1 px-2 sm:px-3 py-1 text-red-600 hover:text-red-700 hover:bg-red-50 rounded text-xs sm:text-sm whitespace-nowrap"
                     >
-                      <LogOut className="h-4 w-4" />
-                      <span>Logout</span>
+                      <LogOut className="h-3 w-3 sm:h-4 sm:w-4" />
+                      <span className="hidden sm:inline">Logout</span>
                     </button>
                   </>
                 )}
