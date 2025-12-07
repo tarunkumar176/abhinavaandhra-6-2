@@ -59,6 +59,11 @@ export const paperAPI = {
     return response.data;
   },
 
+  getLatest: async (limit: number = 7): Promise<ApiResponse<Paper[]>> => {
+    const response = await api.get(`/papers/latest?limit=${limit}`);
+    return response.data;
+  },
+
   upload: async (
     file: File,
     date: string,

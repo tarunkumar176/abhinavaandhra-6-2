@@ -55,6 +55,52 @@ router.get('/', async (req, res) => {
     }
 });
 
+// Get latest papers (public)
+router.get('/latest', async (req, res) => {
+    try {
+        const limit = parseInt(req.query.limit) || 7;
+
+        if (limit < 1 || limit > 50) {
+            return res.status(400).json({
+                success: false,
+                message: 'Limit must be between 1 and 50'
+            });
+        }
+
+        const result = await query(`
+      SELECT 
+        id, date, title, filename, file_url, file_size, 
+        page_count, upload_timestamp, created_at, updated_at, thumbnail_url
+      FROM papers 
+      ORDER BY date DESC
+      LIMIT $1
+    `, [limit]);
+
+        res.json({
+            success: true,
+            data: result.rows.map(row => ({
+                id: row.id.toString(),
+                date: row.date,
+                title: row.title,
+                filename: row.filename,
+                pdfUrl: row.file_url,
+                fileSize: parseInt(row.file_size),
+                pageCount: row.page_count,
+                uploadTimestamp: parseInt(row.upload_timestamp),
+                createdAt: row.created_at,
+                updatedAt: row.updated_at,
+                thumbnailUrl: row.thumbnail_url
+            }))
+        });
+    } catch (error) {
+        console.error('Error fetching latest papers:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to fetch latest papers'
+        });
+    }
+});
+
 // Get paper by date (public)
 router.get('/:date', async (req, res) => {
     try {
