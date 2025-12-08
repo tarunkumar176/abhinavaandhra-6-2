@@ -101,7 +101,8 @@ const Contact: React.FC = () => {
           <div className="card p-6">
             <h2 className="text-2xl font-bold text-telugu-primary mb-6">Get in Touch</h2>
             <p className="text-gray-600 mb-6">
-              We'd love to hear from you. Send us a message and we'll respond as soon as possible.
+              If you have any questions, subscription issues, or need support related to the Abhinava Andhra ePaper platform, feel free to reach out to us.
+
             </p>
             
             <div className="space-y-4">
@@ -111,7 +112,7 @@ const Contact: React.FC = () => {
                 </div>
                 <div>
                   <p className="font-medium text-gray-900">Email</p>
-                  <p className="text-gray-600">admin@teluguepaper.com</p>
+                  <p className="text-gray-600">abhinava.andhra.news@gmail.com</p>
                 </div>
               </div>
               
@@ -121,7 +122,7 @@ const Contact: React.FC = () => {
                 </div>
                 <div>
                   <p className="font-medium text-gray-900">Phone</p>
-                  <p className="text-gray-600">+91 12345 67890</p>
+                  <p className="text-gray-600">++91 94938 02010</p>
                 </div>
               </div>
               
