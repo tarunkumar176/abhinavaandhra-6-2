@@ -10,6 +10,7 @@ const PaperView = lazy(() => import('./src/components/user/PaperView'));
 const AdminLogin = lazy(() => import('./src/components/admin/AdminLogin'));
 const AdminDashboard = lazy(() => import('./src/components/admin/AdminDashboard'));
 const UploadPage = lazy(() => import('./src/components/admin/UploadPage'));
+const PreviousEditions = lazy(() => import('./src/components/user/PreviousEditions'));
 
 // Page components
 const About = lazy(() => import('./src/components/pages/About'));
@@ -26,19 +27,19 @@ function App() {
             <Route path="/" element={<Layout />}>
               <Route index element={<HomePage />} />
               <Route path="paper/:date" element={<PaperView />} />
-              
+
               {/* Page Routes */}
               <Route path="about" element={<About />} />
               <Route path="contact" element={<Contact />} />
               <Route path="privacy-policy" element={<PrivacyPolicy />} />
               <Route path="terms-conditions" element={<TermsConditions />} />
-              <Route path="archive" element={<About />} />
+              <Route path="archive" element={<PreviousEditions />} />
               <Route path="disclaimer" element={<PrivacyPolicy />} />
               <Route path="copyright" element={<TermsConditions />} />
             </Route>
-            
+
             <Route path="/admin" element={<AdminLogin />} />
-            
+
             <Route path="/admin/dashboard" element={
               <ProtectedRoute>
                 <Layout isAdmin>
@@ -53,7 +54,7 @@ function App() {
                 </Layout>
               </ProtectedRoute>
             } />
-            
+
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </Suspense>
