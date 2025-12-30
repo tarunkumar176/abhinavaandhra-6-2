@@ -64,6 +64,8 @@ export async function initializeDatabase() {
         page_count INTEGER NOT NULL,
         upload_timestamp BIGINT NOT NULL,
         thumbnail_url VARCHAR(500),
+        pages_data JSONB,
+        processing_status VARCHAR(20) DEFAULT 'pending',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )

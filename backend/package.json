@@ -10,6 +10,7 @@
     "build": "echo 'Server build complete'",
     "vercel-build": "echo 'Vercel build complete'",
     "migrate:postgres": "node scripts/migrate-postgres.js",
+    "migrate:pdf-processing": "node scripts/add-pdf-processing-columns.js",
     "test:postgres": "node test-postgres.js"
   },
   "dependencies": {
@@ -23,7 +24,9 @@
     "jsonwebtoken": "^9.0.0",
     "multer": "^1.4.5-lts.1",
     "node-cron": "^3.0.3",
+    "pdf-poppler": "^0.2.3",
     "pg": "^8.11.0",
+    "sharp": "^0.34.5",
     "sqlite": "^5.1.1",
     "sqlite3": "^5.1.7"
   },
