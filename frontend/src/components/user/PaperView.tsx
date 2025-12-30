@@ -3,22 +3,19 @@ import { useParams, Link } from 'react-router-dom';
 import {
   ArrowLeft,
   Calendar,
-  Camera,
   ChevronLeft,
   ChevronRight,
   ZoomIn,
   ZoomOut,
-  Plus,
   X,
   Check,
-  Crop,
-  Eye
+  Crop
 } from 'lucide-react';
 import * as pdfjsLib from 'pdfjs-dist';
 import Cropper from 'react-cropper';
 import 'cropperjs/dist/cropper.css';
 
-import { Paper, CropArea } from '../../../types';
+import { Paper } from '../../../types';
 import { paperAPI } from '../../services/api';
 import { formatDisplayDate, getRecentDates, formatLongDate } from '../../utils/dateUtils';
 import { addWatermarkToImage, downloadImage } from '../../utils/imageUtils';
@@ -33,23 +30,14 @@ const PaperView: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [zoom, setZoom] = useState(100);
   const [pdfLoading, setPdfLoading] = useState(false);
-  const [scrollY, setScrollY] = useState(0);
   const [cropMode, setCropMode] = useState(false);
+  const [totalPages, setTotalPages] = useState(0);
   const cropperRef = React.useRef<any>(null);
   const imageRef = React.useRef<HTMLImageElement>(null);
 
   // Set PDF.js worker
   useEffect(() => {
     pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
-  }, []);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrollY(window.scrollY);
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   useEffect(() => {
@@ -61,10 +49,14 @@ const PaperView: React.FC = () => {
   const fetchPaper = async (paperDate: string) => {
     try {
       setLoading(true);
-      const response = await paperAPI.getByDate(paperDate);
-      if (response.success && response.data) {
-        setPaper(response.data);
-        await renderPdfToImages(response.data.pdfUrl);
+      
+      // First get basic paper info
+      const paperResponse = await paperAPI.getByDate(paperDate);
+      if (paperResponse.success && paperResponse.data) {
+        setPaper(paperResponse.data);
+        
+        // For now, use the original PDF with optimized PDF.js rendering
+        await renderPdfToImages(paperResponse.data.pdfUrl);
       } else {
         toast.error('Paper not found for this date');
       }
@@ -76,76 +68,149 @@ const PaperView: React.FC = () => {
     }
   };
 
-  const renderPdfToImages = async (pdfUrl: string) => {
-    try {
-      setPdfLoading(true);
-      // Use the PDF URL directly (works for both local and production)
-      const pdf = await pdfjsLib.getDocument({
-        url: pdfUrl,
-        cMapUrl: `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/cmaps/`,
-        cMapPacked: true,
-      }).promise;
-      
-      // Only render first page initially for faster loading
-      const images: string[] = [];
-      const page = await pdf.getPage(1);
-      const viewport = page.getViewport({ scale: 1.5 }); // Reduced scale for faster loading
-      const canvas = document.createElement('canvas');
-      const context = canvas.getContext('2d');
-
-      if (context) {
-        canvas.width = viewport.width;
-        canvas.height = viewport.height;
-
-        await page.render({
-          canvasContext: context,
-          viewport: viewport,
-        }).promise;
-
-        images.push(canvas.toDataURL('image/jpeg', 0.9)); // Use JPEG for smaller size
-      }
-
-      // Render remaining pages in background
-      setPageImages(images);
-      setCurrentPage(0);
-      setPdfLoading(false);
-
-      // Load other pages in background
-      for (let pageNum = 2; pageNum <= pdf.numPages; pageNum++) {
-        const page = await pdf.getPage(pageNum);
-        const viewport = page.getViewport({ scale: 1.5 });
-        const canvas = document.createElement('canvas');
-        const context = canvas.getContext('2d');
-
-        if (!context) continue;
-
-        canvas.width = viewport.width;
-        canvas.height = viewport.height;
-
-        await page.render({
-          canvasContext: context,
-          viewport: viewport,
-        }).promise;
-
-        images.push(canvas.toDataURL('image/jpeg', 0.9));
-        setPageImages([...images]); // Update state as pages load
-      }
-    } catch (error) {
-      console.error('Error rendering PDF:', error);
-      toast.error('Failed to render PDF pages');
-      setPdfLoading(false);
-    }
-  };
-
   const goToNextPage = () => {
     if (currentPage < pageImages.length - 1) {
       setCurrentPage(currentPage + 1);
+      console.log(`📄 Navigated to page ${currentPage + 2}`);
     }
   };
 
   const goToPreviousPage = () => {
     if (currentPage > 0) {
       setCurrentPage(currentPage - 1);
+      console.log(`📄 Navigated to page ${currentPage}`);
+    }
+  };
+
+  const getCurrentPageImage = () => {
+    const image = pageImages[currentPage];
+    console.log(`🖼️ Getting image for page ${currentPage + 1}:`, image ? 'Found' : 'Not found');
+    return image;
+  };
+
+  const renderPdfToImages = async (pdfUrl: string) => {
+    try {
+      // Convert full URL to relative for proxy
+      const proxyUrl = pdfUrl.replace('http://localhost:5000', '');
+      console.log('🔄 Loading PDF:', proxyUrl);
+      setPdfLoading(true);
+      setPageImages([]); // Clear existing images
+      setCurrentPage(0); // Reset to first page
+      
+      // Load PDF document
+      const pdf = await pdfjsLib.getDocument({
+        url: proxyUrl,
+        cMapUrl: `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/cmaps/`,
+        cMapPacked: true,
+      }).promise;
+      
+      console.log(`📄 PDF loaded with ${pdf.numPages} pages`);
+      setTotalPages(pdf.numPages);
+      
+      // Load ALL pages sequentially for now (simpler approach)
+      const allImages: string[] = [];
+      
+      for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+        console.log(`🖼️ Loading page ${pageNum}/${pdf.numPages}...`);
+        
+        const page = await pdf.getPage(pageNum);
+        const scale = pageNum === 1 ? 2.5 : 2.0; // High quality for first page
+        const viewport = page.getViewport({ scale });
+        
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+
+        if (context) {
+          canvas.width = viewport.width;
+          canvas.height = viewport.height;
+
+          await page.render({
+            canvasContext: context,
+            viewport: viewport,
+          }).promise;
+
+          // Convert to image
+          const imageData = canvas.toDataURL('image/png');
+          allImages.push(imageData);
+          
+          console.log(`✅ Page ${pageNum} loaded successfully`);
+          
+          // Update state after each page loads
+          setPageImages([...allImages]);
+          
+          // Stop loading indicator after first page
+          if (pageNum === 1) {
+            setPdfLoading(false);
+          }
+        }
+      }
+      
+      console.log(`🎉 All ${pdf.numPages} pages loaded successfully`);
+      
+    } catch (error) {
+      console.error('❌ Error rendering PDF:', error);
+      toast.error('Failed to render PDF pages');
+      setPdfLoading(false);
+    }
+  };
+
+  const loadPage = async (pdf: any, pageNum: number, highQuality = false) => {
+    try {
+      console.log(`📄 Loading page ${pageNum} (${highQuality ? 'high' : 'standard'} quality)...`);
+      
+      const page = await pdf.getPage(pageNum);
+      
+      // Use higher scale for better quality
+      const scale = highQuality ? 2.5 : 2.0;
+      const viewport = page.getViewport({ scale });
+      
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+
+      if (!context) {
+        console.error('❌ Failed to get canvas context');
+        return null;
+      }
+
+      canvas.width = viewport.width;
+      canvas.height = viewport.height;
+
+      await page.render({
+        canvasContext: context,
+        viewport: viewport,
+      }).promise;
+
+      // Use WebP for better compression, fallback to PNG
+      let imageData;
+      try {
+        const quality = highQuality ? 0.95 : 0.85;
+        imageData = canvas.toDataURL('image/webp', quality);
+      } catch (webpError) {
+        // Fallback to PNG if WebP not supported
+        imageData = canvas.toDataURL('image/png');
+      }
+      
+      console.log(`✅ Page ${pageNum} loaded successfully`);
+      return imageData;
+    } catch (error) {
+      console.error(`❌ Error loading page ${pageNum}:`, error);
+      return null;
+    }
+  };
+
+  const loadRemainingPages = async (pdf: any) => {
+    const allImages = [...pageImages]; // Start with current images
+    
+    // Load remaining pages
+    for (let pageNum = 2; pageNum <= pdf.numPages; pageNum++) {
+      const imageData = await loadPage(pdf, pageNum, false);
+      if (imageData) {
+        allImages.push(imageData);
+        setPageImages([...allImages]); // Update state as pages load
+      }
+      
+      // Small delay to prevent blocking
+      await new Promise(resolve => setTimeout(resolve, 100));
     }
   };
 
@@ -249,7 +314,7 @@ const PaperView: React.FC = () => {
               <ChevronLeft className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6" />
             </button>
             <span className="text-xs sm:text-sm md:text-base font-medium min-w-[60px] sm:min-w-[80px] md:min-w-[100px] text-center">
-              {pageImages.length > 0 ? `${currentPage + 1} / ${pageImages.length}` : 'No pages'}
+              {totalPages > 0 ? `${currentPage + 1} / ${totalPages}` : 'Loading...'}
             </span>
             <button
               onClick={goToNextPage}
@@ -351,17 +416,18 @@ const PaperView: React.FC = () => {
           </button>
 
           {pdfLoading ? (
-            <div className="flex items-center justify-center h-64 sm:h-96">
-              <div className="animate-spin rounded-full h-8 w-8 sm:h-12 sm:w-12 border-b-2 border-telugu-primary"></div>
+            <div className="flex flex-col items-center justify-center h-64 sm:h-96 text-gray-700">
+              <div className="animate-spin rounded-full h-8 w-8 sm:h-12 sm:w-12 border-b-2 border-telugu-primary mb-4"></div>
+              <p className="text-sm sm:text-base">Loading high-quality pages...</p>
             </div>
-          ) : pageImages.length > 0 ? (
+          ) : getCurrentPageImage() ? (
             cropMode ? (
               <div style={{ width: '100%', height: '80vh' }}>
                 <Cropper
                   ref={cropperRef}
                   style={{ height: '100%', width: '100%' }}
                   initialAspectRatio={NaN}
-                  src={pageImages[currentPage]}
+                  src={getCurrentPageImage()}
                   viewMode={1}
                   guides={true}
                   minCropBoxHeight={10}
@@ -373,17 +439,23 @@ const PaperView: React.FC = () => {
                 />
               </div>
             ) : (
-              <img
-                ref={imageRef}
-                src={pageImages[currentPage]}
-                alt={`Page ${currentPage + 1}`}
-                style={{ width: `${zoom}%`, height: 'auto' }}
-                className="rounded shadow-lg"
-              />
+              <div className="relative">
+                <img
+                  ref={imageRef}
+                  src={getCurrentPageImage()}
+                  alt={`Page ${currentPage + 1}`}
+                  style={{ width: `${zoom}%`, height: 'auto' }}
+                  className="rounded shadow-lg"
+                  loading="eager"
+                />
+              </div>
             )
           ) : (
             <div className="flex items-center justify-center h-64 sm:h-96 text-gray-400">
-              <p className="text-sm sm:text-base">No pages available</p>
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-400 mx-auto mb-4"></div>
+                <p className="text-sm sm:text-base">Loading page {currentPage + 1}...</p>
+              </div>
             </div>
           )}
         </div>

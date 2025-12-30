@@ -41,31 +41,26 @@ const AdminLogin: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-telugu-primary/10 to-telugu-secondary/10 flex items-center justify-center px-4">
       <div className="max-w-md w-full">
         {/* Logo */}
-        <div className="text-center mb-8">
-          <div className="inline-flex flex-col items-center justify-center mb-6">
+        <div className="text-center mb-12">
+          <div className="inline-flex flex-col items-center justify-center mb-10">
             <img 
               src="/logo.jpg" 
               alt="Telugu E-Paper Logo" 
-              className="h-20 w-auto object-contain mb-3"
+              className="h-40 w-auto object-contain mb-10"
             />
             <div className="text-center">
-              <h2 className="text-2xl font-bold text-telugu-primary mb-1">
-                తెలుగు ఈ-పేపర్
-              </h2>
-              <p className="text-xs text-gray-500">
-                THE LARGEST CIRCULATED TELUGU DAILY
-              </p>
+              
             </div>
           </div>
           <h1 className="text-2xl font-bold text-gray-900">Admin Login</h1>
           <p className="text-gray-600 mt-2">
-            Sign in to manage Telugu E-Paper
+            Sign in to manage Abhinavandhra E-Paper
           </p>
         </div>
 
         {/* Login Form */}
         <div className="card p-8">
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-8">
             {/* Email Field */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
@@ -135,15 +130,6 @@ const AdminLogin: React.FC = () => {
               )}
             </button>
           </form>
-
-          {/* Demo Credentials */}
-          <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-            <p className="text-sm text-gray-600 mb-2">Demo Credentials:</p>
-            <p className="text-xs text-gray-500">
-              Email: admin@teluguepaper.com<br />
-              Password: admin123
-            </p>
-          </div>
         </div>
 
         {/* Back to Home */}

@@ -54,6 +54,11 @@ export const paperAPI = {
     return response.data;
   },
 
+  getPagesByDate: async (date: string): Promise<ApiResponse<any>> => {
+    const response = await api.get(`/papers/${date}/pages`);
+    return response.data;
+  },
+
   getRecent: async (days: number = 7): Promise<ApiResponse<Paper[]>> => {
     const response = await api.get(`/papers/recent/${days}`);
     return response.data;
