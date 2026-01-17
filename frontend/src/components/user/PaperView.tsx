@@ -49,14 +49,25 @@ const PaperView: React.FC = () => {
   const fetchPaper = async (paperDate: string) => {
     try {
       setLoading(true);
-      
+
       // First get basic paper info
       const paperResponse = await paperAPI.getByDate(paperDate);
       if (paperResponse.success && paperResponse.data) {
         setPaper(paperResponse.data);
-        
-        // For now, use the original PDF with optimized PDF.js rendering
-        await renderPdfToImages(paperResponse.data.pdfUrl);
+
+        // Check if we have pre-processed pages (server-side processing)
+        if (paperResponse.data.pages && paperResponse.data.pages.length > 0) {
+          console.log('✅ Using pre-processed server images');
+          const images = paperResponse.data.pages.map(p => p.highQuality);
+          setPageImages(images);
+          setTotalPages(images.length);
+          // Set current page to 0 if not already
+          setCurrentPage(0);
+        } else {
+          console.log('⚠️ No server images found, falling back to client-side rendering');
+          // Fallback: use the original PDF with optimized PDF.js rendering
+          await renderPdfToImages(paperResponse.data.pdfUrl);
+        }
       } else {
         toast.error('Paper not found for this date');
       }
@@ -96,27 +107,27 @@ const PaperView: React.FC = () => {
       setPdfLoading(true);
       setPageImages([]); // Clear existing images
       setCurrentPage(0); // Reset to first page
-      
+
       // Load PDF document
       const pdf = await pdfjsLib.getDocument({
         url: proxyUrl,
         cMapUrl: `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/cmaps/`,
         cMapPacked: true,
       }).promise;
-      
+
       console.log(`📄 PDF loaded with ${pdf.numPages} pages`);
       setTotalPages(pdf.numPages);
-      
+
       // Load ALL pages sequentially for now (simpler approach)
       const allImages: string[] = [];
-      
+
       for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
         console.log(`🖼️ Loading page ${pageNum}/${pdf.numPages}...`);
-        
+
         const page = await pdf.getPage(pageNum);
         const scale = pageNum === 1 ? 2.5 : 2.0; // High quality for first page
         const viewport = page.getViewport({ scale });
-        
+
         const canvas = document.createElement('canvas');
         const context = canvas.getContext('2d');
 
@@ -132,21 +143,21 @@ const PaperView: React.FC = () => {
           // Convert to image
           const imageData = canvas.toDataURL('image/png');
           allImages.push(imageData);
-          
+
           console.log(`✅ Page ${pageNum} loaded successfully`);
-          
+
           // Update state after each page loads
           setPageImages([...allImages]);
-          
+
           // Stop loading indicator after first page
           if (pageNum === 1) {
             setPdfLoading(false);
           }
         }
       }
-      
+
       console.log(`🎉 All ${pdf.numPages} pages loaded successfully`);
-      
+
     } catch (error) {
       console.error('❌ Error rendering PDF:', error);
       toast.error('Failed to render PDF pages');
@@ -157,13 +168,13 @@ const PaperView: React.FC = () => {
   const loadPage = async (pdf: any, pageNum: number, highQuality = false) => {
     try {
       console.log(`📄 Loading page ${pageNum} (${highQuality ? 'high' : 'standard'} quality)...`);
-      
+
       const page = await pdf.getPage(pageNum);
-      
+
       // Use higher scale for better quality
       const scale = highQuality ? 2.5 : 2.0;
       const viewport = page.getViewport({ scale });
-      
+
       const canvas = document.createElement('canvas');
       const context = canvas.getContext('2d');
 
@@ -189,7 +200,7 @@ const PaperView: React.FC = () => {
         // Fallback to PNG if WebP not supported
         imageData = canvas.toDataURL('image/png');
       }
-      
+
       console.log(`✅ Page ${pageNum} loaded successfully`);
       return imageData;
     } catch (error) {
@@ -200,7 +211,7 @@ const PaperView: React.FC = () => {
 
   const loadRemainingPages = async (pdf: any) => {
     const allImages = [...pageImages]; // Start with current images
-    
+
     // Load remaining pages
     for (let pageNum = 2; pageNum <= pdf.numPages; pageNum++) {
       const imageData = await loadPage(pdf, pageNum, false);
@@ -208,7 +219,7 @@ const PaperView: React.FC = () => {
         allImages.push(imageData);
         setPageImages([...allImages]); // Update state as pages load
       }
-      
+
       // Small delay to prevent blocking
       await new Promise(resolve => setTimeout(resolve, 100));
     }

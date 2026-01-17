@@ -58,16 +58,29 @@ export async function initializeDatabase() {
     )
   `);
 
-  // Migration: Add thumbnail_url column if it doesn't exist
+  // Migration: Add new columns if they don't exist
   try {
     const tableInfo = await db.all('PRAGMA table_info(papers)');
-    const hasThumbnailUrl = tableInfo.some(col => col.name === 'thumbnail_url');
+    const existingColumns = tableInfo.map(col => col.name);
 
-    if (!hasThumbnailUrl) {
+    if (!existingColumns.includes('thumbnail_url')) {
       console.log('📝 Adding thumbnail_url column to papers table...');
       await db.exec('ALTER TABLE papers ADD COLUMN thumbnail_url TEXT');
       console.log('✅ Migration completed: thumbnail_url column added');
     }
+
+    if (!existingColumns.includes('processing_status')) {
+      console.log('📝 Adding processing_status column to papers table...');
+      await db.exec("ALTER TABLE papers ADD COLUMN processing_status TEXT DEFAULT 'pending'");
+      console.log('✅ Migration completed: processing_status column added');
+    }
+
+    if (!existingColumns.includes('pages_data')) {
+      console.log('📝 Adding pages_data column to papers table...');
+      await db.exec('ALTER TABLE papers ADD COLUMN pages_data TEXT'); // SQLite stores JSON as TEXT
+      console.log('✅ Migration completed: pages_data column added');
+    }
+
   } catch (migrationError) {
     console.error('Migration error:', migrationError);
   }

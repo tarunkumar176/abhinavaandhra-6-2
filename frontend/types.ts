@@ -11,6 +11,17 @@ export interface Paper {
   createdAt: string;
   updatedAt: string;
   thumbnailUrl?: string;
+  pages?: PageData[];
+  processingStatus?: 'pending' | 'processing' | 'completed' | 'failed';
+}
+
+export interface PageData {
+  pageNumber: number;
+  highQuality: string;
+  mediumQuality: string;
+  thumbnail: string;
+  width: number;
+  height: number;
 }
 
 export interface User {

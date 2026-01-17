@@ -92,7 +92,7 @@ export async function initializeDatabase() {
     `);
 
     // Create default admin user if it doesn't exist
-    const adminEmail = process.env.DB_EMAIL || 'admin@teluguepaper.com';
+    const adminEmail = process.env.ADMIN_EMAIL || 'admin@teluguepaper.com';
     const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
     
     const existingAdmin = await client.query(

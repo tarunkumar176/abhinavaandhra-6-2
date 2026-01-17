@@ -24,32 +24,39 @@ const formatDate = (date) => {
 async function processPdfInBackground(paperId, pdfPath, paperDate, pdfUrl) {
     try {
         console.log(`🔄 Starting background processing for paper ${paperId}`);
-        
+
         // Update status to processing
         await query(
             'UPDATE papers SET processing_status = ? WHERE id = ?',
             ['processing', paperId]
         );
 
-        // For now, skip PDF processing and mark as completed
-        // This allows the system to work while we set up proper PDF processing
+        // Process PDF to images
+        console.log(`📑 Converting PDF to images for paper ${paperId}...`);
+        const result = await pdfProcessor.convertPdfToImages(pdfPath, paperDate);
+
+        console.log(`✅ PDF processing complete for paper ${paperId}. Generated ${result.totalPages} pages.`);
+
+        // Update paper with page data and status
         await query(`
             UPDATE papers SET 
                 page_count = ?,
                 processing_status = ?,
+                pages_data = ?,
                 updated_at = CURRENT_TIMESTAMP
             WHERE id = ?
         `, [
-            1, // Default page count
-            'completed',
+            result.totalPages,
+            'completed', // Mark as completed only after successful processing
+            JSON.stringify(result.pages),
             paperId
         ]);
 
-        console.log(`✅ Paper ${paperId} marked as completed (PDF processing skipped for now)`);
-        
+        console.log(`💾 Paper ${paperId} database record updated with page images.`);
+
     } catch (error) {
         console.error(`❌ Failed to process PDF for paper ${paperId}:`, error);
-        
+
         // Update status to failed
         await query(
             'UPDATE papers SET processing_status = ? WHERE id = ?',
@@ -400,7 +407,7 @@ router.post('/upload',
         INSERT INTO papers (
           date, title, filename, file_path, file_url, 
           file_size, page_count, upload_timestamp, thumbnail_url
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
         RETURNING id
       `, [
                 date,
@@ -414,12 +421,12 @@ router.post('/upload',
                 thumbnailUrl
             ]);
 
-            const insertedId = result.rows[0]?.id || result.lastID;
+            const insertedId = result.rows[0].id;
 
             console.log('Paper uploaded successfully, starting PDF processing...');
 
             // Process PDF to images in background
-            processPdfInBackground(result.rows[0]?.id || result.lastID, pdfFile.path, date, pdfFileUrl);
+            processPdfInBackground(insertedId, pdfFile.path, date, pdfFileUrl);
 
             res.status(201).json({
                 success: true,
@@ -540,7 +547,7 @@ router.get('/:date/pages', async (req, res) => {
         }
 
         const paper = result.rows[0];
-        
+
         // If processing is complete, return the page data
         if (paper.processing_status === 'completed' && paper.pages_data) {
             return res.json({
