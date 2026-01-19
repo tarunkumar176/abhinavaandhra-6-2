@@ -1,8 +1,8 @@
-import pdf from 'pdf-poppler';
 import sharp from 'sharp';
 import fs from 'fs-extra';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import os from 'os';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -24,69 +24,104 @@ export class PDFProcessor {
    * @returns {Promise<Array>} Array of image paths and metadata
    */
   async convertPdfToImages(pdfPath, paperDate) {
+    const isWindows = os.platform() === 'win32';
+
     try {
       console.log(`🔄 Converting PDF to images: ${pdfPath}`);
-      
+      console.log(`💻 Detected Platform: ${os.platform()}`);
+
       // Create date-specific folder
       const dateFolder = path.join(this.outputDir, paperDate);
       await fs.ensureDir(dateFolder);
 
-      // Configure pdf-poppler options
-      const options = {
-        format: 'png',
-        out_dir: dateFolder,
-        out_prefix: 'page',
-        page: null, // Convert all pages
-        scale: 2048 // High resolution
-      };
+      let imageBuffers = [];
+      let totalPages = 0;
 
-      // Convert PDF to images
-      console.log('📄 Starting PDF conversion...');
-      const pdfData = await pdf.convert(pdfPath, options);
-      
-      console.log(`📄 PDF converted to ${pdfData.length} pages`);
+      if (isWindows) {
+        // --- WINDOWS STRATEGY (pdf-poppler) ---
+        console.log('🏁 Using pdf-poppler (Windows)...');
+        // Dynamic import to avoid issues on Linux
+        const { default: pdf } = await import('pdf-poppler');
 
-      const imageResults = [];
-      
-      // Process each generated image
-      for (let i = 0; i < pdfData.length; i++) {
-        const pageNum = i + 1;
-        const inputImagePath = path.join(dateFolder, `page-${pageNum}.png`);
-        
-        console.log(`🖼️  Processing page ${pageNum}/${pdfData.length}`);
-        
-        if (await fs.pathExists(inputImagePath)) {
-          // Create high-quality WebP version
-          const highQualityPath = path.join(dateFolder, `page-${pageNum}-hq.webp`);
-          await sharp(inputImagePath)
-            .webp({ quality: 95, effort: 6 })
-            .toFile(highQualityPath);
-          
-          // Create medium-quality version
-          const mediumQualityPath = path.join(dateFolder, `page-${pageNum}-mq.webp`);
-          await sharp(inputImagePath)
-            .webp({ quality: 80, effort: 6 })
-            .toFile(mediumQualityPath);
-          
-          // Create thumbnail
-          const thumbnailPath = path.join(dateFolder, `page-${pageNum}-thumb.webp`);
-          await sharp(inputImagePath)
-            .resize(400, 566, { fit: 'inside', withoutEnlargement: true })
-            .webp({ quality: 70, effort: 6 })
-            .toFile(thumbnailPath);
-          
-          // Remove original PNG file to save space
-          await fs.remove(inputImagePath);
-          
-          imageResults.push({
-            pageNumber: pageNum,
-            highQuality: `/uploads/pages/${paperDate}/page-${pageNum}-hq.webp`,
-            mediumQuality: `/uploads/pages/${paperDate}/page-${pageNum}-mq.webp`,
-            thumbnail: `/uploads/pages/${paperDate}/page-${pageNum}-thumb.webp`,
-            width: 2048,
-            height: Math.round(2048 * 1.414) // A4 ratio
-          });
+        const options = {
+          format: 'png',
+          out_dir: dateFolder,
+          out_prefix: 'page',
+          page: null,
+          scale: 2048
+        };
+
+        await pdf.convert(pdfPath, options);
+
+        // Count generated files
+        const files = await fs.readdir(dateFolder);
+        const pngFiles = files.filter(f => f.startsWith('page-') && f.endsWith('.png'));
+        totalPages = pngFiles.length;
+        console.log(`📄 Generated ${totalPages} PNG files via pdf-poppler`);
+
+        // Prepare for processing
+        for (let i = 1; i <= totalPages; i++) {
+          const inputPath = path.join(dateFolder, `page-${i}.png`);
+          if (await fs.pathExists(inputPath)) {
+            imageBuffers.push({
+              buffer: inputPath, // sharp accepts path
+              pageNum: i,
+              isPath: true // flag to know we need to delete it
+            });
+          }
         }
+
+      } else {
+        // --- LINUX/RENDER STRATEGY (pdf-img-convert) ---
+        console.log('🐧 Using pdf-img-convert (Linux/Render)...');
+        // Dynamic import to avoid issues on Windows local dev
+        const { default: pdf2img } = await import('pdf-img-convert');
+
+        const pdfData = await pdf2img.convert(pdfPath, {
+          scale: 2.5 // ~180dpi
+        });
+
+        totalPages = pdfData.length;
+        console.log(`📄 Generated ${totalPages} page buffers in memory`);
+
+        pdfData.forEach((buffer, index) => {
+          imageBuffers.push({
+            buffer: buffer,
+            pageNum: index + 1,
+            isPath: false
+          });
+        });
+      }
+
+      console.log('🖼️  Processing images into WebP...');
+      const imageResults = [];
+
+      for (const item of imageBuffers) {
+        const { buffer, pageNum, isPath } = item;
+
+        // Define paths
+        const highQualityPath = path.join(dateFolder, `page-${pageNum}-hq.webp`);
+        const mediumQualityPath = path.join(dateFolder, `page-${pageNum}-mq.webp`);
+        const thumbnailPath = path.join(dateFolder, `page-${pageNum}-thumb.webp`);
+
+        // Create versions
+        await sharp(buffer).webp({ quality: 95, effort: 4 }).toFile(highQualityPath);
+        await sharp(buffer).webp({ quality: 80, effort: 4 }).toFile(mediumQualityPath);
+        await sharp(buffer).resize(400, 566, { fit: 'inside' }).webp({ quality: 70 }).toFile(thumbnailPath);
+
+        // If it was a temp file from pdf-poppler, delete it
+        if (isPath) {
+          await fs.remove(buffer);
+        }
+
+        imageResults.push({
+          pageNumber: pageNum,
+          highQuality: `/uploads/pages/${paperDate}/page-${pageNum}-hq.webp`,
+          mediumQuality: `/uploads/pages/${paperDate}/page-${pageNum}-mq.webp`,
+          thumbnail: `/uploads/pages/${paperDate}/page-${pageNum}-thumb.webp`,
+          width: 2048,
+          height: Math.round(2048 * 1.414)
+        });
       }
 
       console.log(`✅ Successfully processed ${imageResults.length} pages`);
@@ -121,7 +156,7 @@ export class PDFProcessor {
    */
   getImageUrls(paperDate, totalPages, baseUrl = '') {
     const pages = [];
-    
+
     for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
       pages.push({
         pageNumber: pageNum,
@@ -130,7 +165,7 @@ export class PDFProcessor {
         thumbnail: `${baseUrl}/uploads/pages/${paperDate}/page-${pageNum}-thumb.webp`
       });
     }
-    
+
     return pages;
   }
 }
