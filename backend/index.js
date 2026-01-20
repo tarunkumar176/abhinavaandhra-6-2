@@ -204,7 +204,7 @@ async function startServer() {
       console.log(`🚀 Server running on port ${PORT}`);
       console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
       console.log(
-        `🔗 Frontend URL: ${process.env.FRONTEND_URL || 'http://localhost:3000'}`
+        `🔗 Frontend URL: ${process.env.FRONTEND_URL || 'https://epaper-1bys-87jk49mvu-vamsi-naidu7s-projects.vercel.app'}`
       );
     });
   } catch (error) {
