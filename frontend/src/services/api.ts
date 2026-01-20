@@ -1,7 +1,16 @@
 import axios from 'axios';
 import { Paper, User, ApiResponse, UploadProgress } from '../types';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://epaper-7o2a.onrender.com/api';
+// ✅ Force API URL to always end with /api (Fixes Vercel 404s)
+const getApiUrl = () => {
+  let url = import.meta.env.VITE_API_URL || 'https://epaper-7o2a.onrender.com/api';
+  if (!url.endsWith('/api')) {
+    url += '/api';
+  }
+  return url;
+};
+
+const API_BASE_URL = getApiUrl();
 
 const api = axios.create({
   baseURL: API_BASE_URL,
