@@ -220,8 +220,8 @@ cron.schedule('0 2 * * *', async () => {
 });
 
 // ✅ Keep-Alive Cron Job (Prevent Render Free Tier Sleep)
-// Pings the server every 14 minutes (Render sleeps after 15 mins of inactivity)
-cron.schedule('*/14 * * * *', async () => {
+// Pings the server every 5 minutes (Render sleeps after 15 mins of inactivity)
+cron.schedule('*/5 * * * *', async () => {
   const healthUrl = process.env.RENDER_EXTERNAL_URL
     ? `${process.env.RENDER_EXTERNAL_URL}/api/health`
     : 'https://epaper-7o2a.onrender.com/api/health';
