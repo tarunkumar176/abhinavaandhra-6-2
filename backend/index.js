@@ -219,6 +219,26 @@ cron.schedule('0 2 * * *', async () => {
   }
 });
 
+// ✅ Keep-Alive Cron Job (Prevent Render Free Tier Sleep)
+// Pings the server every 14 minutes (Render sleeps after 15 mins of inactivity)
+cron.schedule('*/14 * * * *', async () => {
+  const healthUrl = process.env.RENDER_EXTERNAL_URL
+    ? `${process.env.RENDER_EXTERNAL_URL}/api/health`
+    : 'https://epaper-7o2a.onrender.com/api/health';
+
+  console.log(`💓 Sending keep-alive ping to ${healthUrl}...`);
+  try {
+    const response = await fetch(healthUrl);
+    if (response.ok) {
+      console.log('✅ Keep-alive ping successful.');
+    } else {
+      console.error(`⚠️ Keep-alive ping returned status: ${response.status}`);
+    }
+  } catch (error) {
+    console.error('❌ Keep-alive ping failed:', error.message);
+  }
+});
+
 // ✅ Start Server (RENDER SAFE)
 async function startServer() {
   try {
