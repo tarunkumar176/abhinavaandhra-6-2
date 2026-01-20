@@ -43,19 +43,25 @@ app.use(
           "'self'",
           "http://localhost:3000",
           "https://epaper-page.onrender.com",
-          "https://epaper-front.onrender.com"
+          "https://epaper-front.onrender.com",
+          "https://epaper-1bys-87jk49mvu-vamsi-naidu7s-projects.vercel.app",
+          "https://epaper-mauve.vercel.app"
         ],
         frameAncestors: [
           "'self'",
           "http://localhost:3000",
           "https://epaper-page.onrender.com",
-          "https://epaper-front.onrender.com"
+          "https://epaper-front.onrender.com",
+          "https://epaper-1bys-87jk49mvu-vamsi-naidu7s-projects.vercel.app",
+          "https://epaper-mauve.vercel.app"
         ],
         imgSrc: [
           "'self'",
           "data:",
           "https://epaper-page.onrender.com",
-          "https://epaper-front.onrender.com"
+          "https://epaper-front.onrender.com",
+          "https://epaper-1bys-87jk49mvu-vamsi-naidu7s-projects.vercel.app",
+          "https://epaper-mauve.vercel.app"
         ],
         scriptSrc: ["'self'"],
         styleSrc: ["'self'", "'unsafe-inline'", "https:"]
@@ -79,6 +85,8 @@ app.use(
       'http://localhost:3000',
       'https://epapera0.vercel.app',
       'https://epaper-front.onrender.com',
+      'https://epaper-1bys-87jk49mvu-vamsi-naidu7s-projects.vercel.app',
+      'https://epaper-mauve.vercel.app',
       process.env.FRONTEND_URL
     ].filter(Boolean),
     credentials: true
@@ -101,6 +109,8 @@ app.use(
       'http://localhost:3000',
       'https://epaper-page.onrender.com',
       'https://epaper-front.onrender.com',
+      'https://epaper-1bys-87jk49mvu-vamsi-naidu7s-projects.vercel.app',
+      'https://epaper-mauve.vercel.app',
       process.env.FRONTEND_URL
     ].filter(Boolean);
 
@@ -204,7 +214,7 @@ async function startServer() {
       console.log(`🚀 Server running on port ${PORT}`);
       console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
       console.log(
-        `🔗 Frontend URL: ${process.env.FRONTEND_URL || 'https://epaper-1bys-87jk49mvu-vamsi-naidu7s-projects.vercel.app'}`
+        `🔗 Frontend URL: ${process.env.FRONTEND_URL || 'http://localhost:3000'}`
       );
     });
   } catch (error) {
