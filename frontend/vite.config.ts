@@ -11,7 +11,7 @@ export default defineConfig(({ mode }) => {
       historyApiFallback: true,
       proxy: {
         '/uploads': {
-          target: 'http://localhost:5000',
+          target: 'https://epaper-7o2a.onrender.com',
           changeOrigin: true,
         }
       }
