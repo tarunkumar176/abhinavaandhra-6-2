@@ -48,7 +48,9 @@ app.use(
           "https://epaper-mauve.vercel.app",
           "https://epaper-7o2a.onrender.com",
           "https://epaper-1bys.vercel.app",
-          "https://epaper-1bys-awla4qbc5-vamsi-naidu7s-projects.vercel.app"
+          "https://epaper-1bys-awla4qbc5-vamsi-naidu7s-projects.vercel.app",
+          "https://www.abhinavaandhra.com",
+          "https://abhinavaandhra.com"
         ],
         frameAncestors: [
           "'self'",
@@ -94,6 +96,8 @@ app.use(
       'https://epaper-mauve.vercel.app',
       'https://epaper-1bys.vercel.app',
       'https://epaper-1bys-awla4qbc5-vamsi-naidu7s-projects.vercel.app',
+      'https://www.abhinavaandhra.com',
+      'https://abhinavaandhra.com',
       process.env.FRONTEND_URL
     ].filter(Boolean),
     credentials: true
@@ -120,6 +124,8 @@ app.use(
       'https://epaper-mauve.vercel.app',
       'https://epaper-1bys.vercel.app',
       'https://epaper-1bys-awla4qbc5-vamsi-naidu7s-projects.vercel.app',
+      'https://www.abhinavaandhra.com',
+      'https://abhinavaandhra.com',
       process.env.FRONTEND_URL
     ].filter(Boolean);
 
