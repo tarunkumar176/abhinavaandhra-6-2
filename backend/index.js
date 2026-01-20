@@ -45,7 +45,8 @@ app.use(
           "https://epaper-page.onrender.com",
           "https://epaper-front.onrender.com",
           "https://epaper-1bys-87jk49mvu-vamsi-naidu7s-projects.vercel.app",
-          "https://epaper-mauve.vercel.app"
+          "https://epaper-mauve.vercel.app",
+          "https://epaper-7o2a.onrender.com"
         ],
         frameAncestors: [
           "'self'",
@@ -53,7 +54,8 @@ app.use(
           "https://epaper-page.onrender.com",
           "https://epaper-front.onrender.com",
           "https://epaper-1bys-87jk49mvu-vamsi-naidu7s-projects.vercel.app",
-          "https://epaper-mauve.vercel.app"
+          "https://epaper-mauve.vercel.app",
+          "https://epaper-7o2a.onrender.com"
         ],
         imgSrc: [
           "'self'",
@@ -61,7 +63,8 @@ app.use(
           "https://epaper-page.onrender.com",
           "https://epaper-front.onrender.com",
           "https://epaper-1bys-87jk49mvu-vamsi-naidu7s-projects.vercel.app",
-          "https://epaper-mauve.vercel.app"
+          "https://epaper-mauve.vercel.app",
+          "https://epaper-7o2a.onrender.com"
         ],
         scriptSrc: ["'self'"],
         styleSrc: ["'self'", "'unsafe-inline'", "https:"]
