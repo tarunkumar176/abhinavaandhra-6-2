@@ -50,7 +50,7 @@ const HomePage: React.FC = () => {
         {/* Today's Paper Card */}
         {todaysPaper ? (
           <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden mb-8 sm:mb-12">
-            <div className="grid md:grid-cols-2 gap-6 sm:gap-8 p-4 sm:p-8 md:p-12">
+            <div className="grid md:grid-cols-2 gap-6 sm:gap-8 p-4 sm:p-12">
               {/* Left: Paper Preview - Clickable */}
               <div
                 className="flex items-center justify-center cursor-pointer group"
