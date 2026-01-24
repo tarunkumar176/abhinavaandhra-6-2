@@ -313,13 +313,13 @@ const PaperView: React.FC = () => {
       {/* PDF Viewer as Images */}
       <div className="card p-2 sm:p-3 md:p-4 lg:p-5">
         {/* Toolbar */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-3 md:gap-4 p-2 sm:p-3 md:p-4 mb-3 sm:mb-4 md:mb-5 border rounded-lg bg-gray-50">
+        <div className="flex flex-wrap items-center justify-between gap-y-2 gap-x-2 p-2 sm:p-3 md:p-4 mb-3 sm:mb-4 md:mb-5 border rounded-lg bg-gray-50">
           {/* Navigation Controls */}
-          <div className="flex items-center gap-1 sm:gap-2 md:gap-3">
+          <div className="flex items-center gap-1 sm:gap-2 md:gap-3 flex-grow sm:flex-grow-0 justify-center sm:justify-start order-1">
             <button
               onClick={goToPreviousPage}
               disabled={currentPage === 0}
-              className="p-1 sm:p-1.5 md:p-2 rounded hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition active:scale-95"
+              className="p-1.5 sm:p-2 rounded hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition active:scale-95 border sm:border-0 border-gray-200"
               title="Previous page"
             >
               <ChevronLeft className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6" />
@@ -330,7 +330,7 @@ const PaperView: React.FC = () => {
             <button
               onClick={goToNextPage}
               disabled={currentPage >= pageImages.length - 1}
-              className="p-1 sm:p-1.5 md:p-2 rounded hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition active:scale-95"
+              className="p-1.5 sm:p-2 rounded hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition active:scale-95 border sm:border-0 border-gray-200"
               title="Next page"
             >
               <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6" />
@@ -338,20 +338,20 @@ const PaperView: React.FC = () => {
           </div>
 
           {/* Zoom Controls */}
-          <div className="flex items-center gap-1 sm:gap-2 md:gap-3">
+          <div className="flex items-center gap-1 sm:gap-2 md:gap-3 flex-grow sm:flex-grow-0 justify-center sm:justify-end order-2">
             <button
               onClick={handleZoomOut}
               disabled={zoom <= 50}
-              className="p-1 sm:p-1.5 md:p-2 rounded hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition active:scale-95"
+              className="p-1.5 sm:p-2 rounded hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition active:scale-95"
               title="Zoom out"
             >
               <ZoomOut className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6" />
             </button>
-            <span className="text-xs sm:text-sm md:text-base font-medium min-w-[45px] sm:min-w-[60px] md:min-w-[70px] text-center">{zoom}%</span>
+            <span className="text-xs sm:text-sm md:text-base font-medium min-w-[40px] sm:min-w-[50px] md:min-w-[70px] text-center">{zoom}%</span>
             <button
               onClick={handleZoomIn}
               disabled={zoom >= 100}
-              className="p-1 sm:p-1.5 md:p-2 rounded hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition active:scale-95"
+              className="p-1.5 sm:p-2 rounded hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition active:scale-95"
               title="Zoom in"
             >
               <ZoomIn className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6" />
@@ -361,7 +361,7 @@ const PaperView: React.FC = () => {
 
             <button
               onClick={toggleCropMode}
-              className={`p-1 sm:p-1.5 md:p-2 rounded transition active:scale-95 ${cropMode
+              className={`p-1.5 sm:p-2 rounded transition active:scale-95 ${cropMode
                 ? 'bg-telugu-primary text-white shadow-md'
                 : 'hover:bg-gray-200 text-gray-700'
                 }`}
@@ -374,14 +374,14 @@ const PaperView: React.FC = () => {
               <>
                 <button
                   onClick={handleScreenshot}
-                  className="p-1 sm:p-1.5 md:p-2 rounded bg-green-600 text-white hover:bg-green-700 transition active:scale-95"
+                  className="p-1.5 sm:p-2 rounded bg-green-600 text-white hover:bg-green-700 transition active:scale-95"
                   title="Save Crop"
                 >
                   <Check className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6" />
                 </button>
                 <button
                   onClick={() => setCropMode(false)}
-                  className="p-1 sm:p-1.5 md:p-2 rounded bg-red-500 text-white hover:bg-red-600 transition active:scale-95"
+                  className="p-1.5 sm:p-2 rounded bg-red-500 text-white hover:bg-red-600 transition active:scale-95"
                   title="Cancel Crop"
                 >
                   <X className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6" />
@@ -393,16 +393,16 @@ const PaperView: React.FC = () => {
 
         {/* Page Display - White Background */}
         <div
-          className="relative flex justify-center items-center bg-white rounded-lg p-2 sm:p-3 md:p-4 group"
+          className="relative flex justify-center items-center bg-white rounded-lg p-1 sm:p-3 md:p-4 group min-h-[50vh] sm:min-h-[60vh]"
           style={{
             minHeight: 'clamp(300px, 60vh, 900px)',
           }}
         >
-          {/* Left Arrow */}
+          {/* Left Arrow (Desktop Only) */}
           <button
             onClick={goToPreviousPage}
             disabled={currentPage === 0}
-            className="fixed left-2 sm:left-4 text-gray-700 p-2 sm:p-3 rounded-full transition z-10 bg-gray-200/80 hover:bg-gray-300/90 disabled:bg-gray-100/50 disabled:cursor-not-allowed shadow-md"
+            className="hidden sm:block fixed left-2 sm:left-4 text-gray-700 p-2 sm:p-3 rounded-full transition z-10 bg-gray-200/80 hover:bg-gray-300/90 disabled:bg-gray-100/50 disabled:cursor-not-allowed shadow-md"
             style={{
               top: '50%',
               transform: 'translateY(-50%)',
@@ -412,11 +412,11 @@ const PaperView: React.FC = () => {
             <ChevronLeft className="h-6 w-6 sm:h-8 sm:w-8" />
           </button>
 
-          {/* Right Arrow */}
+          {/* Right Arrow (Desktop Only) */}
           <button
             onClick={goToNextPage}
             disabled={currentPage >= pageImages.length - 1}
-            className="fixed right-2 sm:right-4 text-gray-700 p-2 sm:p-3 rounded-full transition z-10 bg-gray-200/80 hover:bg-gray-300/90 disabled:bg-gray-100/50 disabled:cursor-not-allowed shadow-md"
+            className="hidden sm:block fixed right-2 sm:right-4 text-gray-700 p-2 sm:p-3 rounded-full transition z-10 bg-gray-200/80 hover:bg-gray-300/90 disabled:bg-gray-100/50 disabled:cursor-not-allowed shadow-md"
             style={{
               top: '50%',
               transform: 'translateY(-50%)',

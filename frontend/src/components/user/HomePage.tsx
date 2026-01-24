@@ -49,22 +49,22 @@ const HomePage: React.FC = () => {
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
         {/* Today's Paper Card */}
         {todaysPaper ? (
-          <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden mb-12">
-            <div className="grid md:grid-cols-2 gap-8 p-8 sm:p-12">
+          <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden mb-8 sm:mb-12">
+            <div className="grid md:grid-cols-2 gap-6 sm:gap-8 p-4 sm:p-8 md:p-12">
               {/* Left: Paper Preview - Clickable */}
-              <div 
+              <div
                 className="flex items-center justify-center cursor-pointer group"
                 onClick={handleNavigateToPaper}
               >
                 {todaysPaper.thumbnailUrl ? (
-                  <img 
-                    src={todaysPaper.thumbnailUrl} 
+                  <img
+                    src={todaysPaper.thumbnailUrl}
                     alt={todaysPaper.title}
                     className="w-full h-auto object-contain shadow-xl transition-transform duration-300 group-hover:scale-[1.02]"
                   />
                 ) : (
-                  <div className="flex flex-col items-center justify-center h-96 w-full bg-gray-100 rounded-lg">
-                    <FileText className="h-24 w-24 text-gray-400 mb-4" />
+                  <div className="flex flex-col items-center justify-center h-64 sm:h-96 w-full bg-gray-100 rounded-lg">
+                    <FileText className="h-16 sm:h-24 w-16 sm:w-24 text-gray-400 mb-4" />
                     <p className="text-gray-500 font-medium">Today's Edition</p>
                   </div>
                 )}
@@ -72,39 +72,39 @@ const HomePage: React.FC = () => {
 
               {/* Right: Paper Details */}
               <div className="flex flex-col justify-center">
-                <div className="flex items-center gap-2 mb-6">
+                <div className="flex items-center gap-2 mb-4 sm:mb-6">
                   <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                  <span className="text-green-700 font-semibold text-sm uppercase tracking-wide">Available Now</span>
+                  <span className="text-green-700 font-semibold text-xs sm:text-sm uppercase tracking-wide">Available Now</span>
                 </div>
 
-                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-3 leading-tight">
+                <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2 sm:mb-3 leading-tight">
                   {todaysPaper.title}
                 </h2>
-                
-                <p className="text-xl text-gray-600 mb-8">
+
+                <p className="text-lg sm:text-xl text-gray-600 mb-6 sm:mb-8">
                   {formatDisplayDate(todaysPaper.date)}
                 </p>
 
                 <button
                   onClick={handleNavigateToPaper}
-                  className="w-full inline-flex items-center justify-center gap-3 bg-gray-900 text-white px-8 py-5 rounded-lg font-bold text-lg hover:bg-gray-800 transition-all shadow-md hover:shadow-lg active:scale-[0.98]"
+                  className="w-full inline-flex items-center justify-center gap-3 bg-gray-900 text-white px-6 sm:px-8 py-3 sm:py-5 rounded-lg font-bold text-base sm:text-lg hover:bg-gray-800 transition-all shadow-md hover:shadow-lg active:scale-[0.98]"
                 >
-                  <FileText className="h-6 w-6" />
+                  <FileText className="h-5 w-5 sm:h-6 sm:w-6" />
                   <span>Read Today's Paper</span>
-                  <ArrowRight className="h-6 w-6" />
+                  <ArrowRight className="h-5 w-5 sm:h-6 sm:w-6" />
                 </button>
               </div>
             </div>
           </div>
         ) : (
-          <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-8 sm:p-12 mb-12 text-center">
+          <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 sm:p-8 md:p-12 mb-12 text-center">
             <div className="max-w-md mx-auto">
               <FileText className="h-16 w-16 mx-auto mb-6 text-gray-400" />
-              
+
               <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
                 Today's Paper Not Yet Available
               </h2>
-              
+
               <p className="text-lg text-gray-600 mb-8">
                 Our team is preparing today's edition. New papers are typically published by 6:00 AM each morning.
               </p>
@@ -113,7 +113,7 @@ const HomePage: React.FC = () => {
                 <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse"></div>
                 <span>Check back soon</span>
               </div>
-              
+
               <Link
                 to="/archive"
                 className="inline-flex items-center gap-2 text-gray-900 hover:text-gray-700 font-semibold text-base border-b-2 border-gray-900 hover:border-gray-700 transition-colors pb-1"
@@ -131,12 +131,12 @@ const HomePage: React.FC = () => {
             <div className="text-gray-900 font-bold text-lg mb-2">Multi-Device</div>
             <p className="text-gray-600 text-sm">Access on phone, tablet, or computer</p>
           </div>
-          
+
           <div className="bg-white rounded-lg border border-gray-200 p-6">
             <div className="text-gray-900 font-bold text-lg mb-2">Full Archive</div>
             <p className="text-gray-600 text-sm">Browse and read past editions anytime</p>
           </div>
-          
+
           <div className="bg-white rounded-lg border border-gray-200 p-6">
             <div className="text-gray-900 font-bold text-lg mb-2">Daily Updates</div>
             <p className="text-gray-600 text-sm">Fresh content every morning by 6 AM</p>

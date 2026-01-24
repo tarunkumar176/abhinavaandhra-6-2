@@ -48,16 +48,16 @@ const Layout: React.FC<LayoutProps> = ({ children, isAdmin = false }) => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
-        {/* Top Logo Section */}
-        <div className="bg-white py-6">
+      <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+        {/* Top Logo Section - Compact on mobile */}
+        <div className="bg-white py-2 sm:py-6">
           <div className="max-w-xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-center items-center">
               <Link to="/" className="flex flex-col items-center">
                 <img
                   src="/logo.jpg"
                   alt="Telugu E-Paper Logo"
-                  className="h-25 w-auto object-contain hover:opacity-90 transition-opacity"
+                  className="h-16 sm:h-24 w-auto object-contain hover:opacity-90 transition-opacity"
                 />
               </Link>
             </div>
@@ -66,20 +66,20 @@ const Layout: React.FC<LayoutProps> = ({ children, isAdmin = false }) => {
 
         {/* Navigation Bar */}
         <div className="bg-white border-t border-gray-200">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-12">
               {/* Left Navigation */}
-              <nav className="flex items-center space-x-1">
+              <nav className="flex items-center space-x-2 w-full justify-between sm:justify-start">
                 {!isAdmin ? (
                   <>
                     {/* Date Selector with Dropdown */}
                     <div className="relative" ref={datePickerRef}>
                       <button
                         onClick={() => setShowDatePicker(!showDatePicker)}
-                        className="flex items-center space-x-2 px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 transition-colors"
+                        className="flex items-center space-x-2 px-2 sm:px-3 py-1.5 bg-blue-600 text-white rounded text-xs sm:text-sm hover:bg-blue-700 transition-colors"
                       >
-                        <Calendar className="h-4 w-4" />
-                        <span>{new Date(selectedDate).toLocaleDateString('en-GB', {
+                        <Calendar className="h-3 w-3 sm:h-4 sm:w-4" />
+                        <span className="font-medium">{new Date(selectedDate).toLocaleDateString('en-GB', {
                           day: '2-digit',
                           month: 'short',
                           year: '2-digit'
@@ -117,18 +117,18 @@ const Layout: React.FC<LayoutProps> = ({ children, isAdmin = false }) => {
                       )}
                     </div>
 
-                    {/* Location */}
-                    <div className="px-3 py-1 bg-gray-100 text-gray-700 rounded text-sm font-medium">
+                    {/* Location - Hidden on small mobile */}
+                    <div className="hidden xs:block px-2 sm:px-3 py-1 bg-gray-100 text-gray-700 rounded text-xs sm:text-sm font-medium">
                       ANDHRA PRADESH
                     </div>
 
-                    {/* Home */}
+                    {/* Home - Icon only on mobile */}
                     <Link
                       to="/"
-                      className="flex items-center space-x-1 px-3 py-1 text-gray-700 hover:text-telugu-primary hover:bg-gray-100 rounded text-sm"
+                      className="flex items-center space-x-1 px-2 sm:px-3 py-1 text-gray-700 hover:text-telugu-primary hover:bg-gray-100 rounded text-sm"
                     >
                       <Home className="h-4 w-4" />
-                      <span>Home</span>
+                      <span className="hidden sm:inline">Home</span>
                     </Link>
                   </>
                 ) : (
@@ -151,18 +151,18 @@ const Layout: React.FC<LayoutProps> = ({ children, isAdmin = false }) => {
                 )}
               </nav>
 
-              {/* Right Navigation */}
-              <div className="flex items-center space-x-2 sm:space-x-4">
+              {/* Right Navigation (Logout) */}
+              <div className="flex items-center pl-2">
                 {isAuthenticated && (
                   <>
-                    <span className="text-xs sm:text-sm text-gray-600 truncate max-w-[120px] sm:max-w-none">
+                    <span className="hidden sm:inline text-xs sm:text-sm text-gray-600 mr-2">
                       {user?.email}
                     </span>
                     <button
                       onClick={handleLogout}
-                      className="flex items-center space-x-1 px-2 sm:px-3 py-1 text-red-600 hover:text-red-700 hover:bg-red-50 rounded text-xs sm:text-sm whitespace-nowrap"
+                      className="flex items-center space-x-1 px-2 py-1 text-red-600 hover:text-red-700 hover:bg-red-50 rounded text-xs sm:text-sm whitespace-nowrap"
                     >
-                      <LogOut className="h-3 w-3 sm:h-4 sm:w-4" />
+                      <LogOut className="h-4 w-4" />
                       <span className="hidden sm:inline">Logout</span>
                     </button>
                   </>
@@ -194,7 +194,7 @@ const Layout: React.FC<LayoutProps> = ({ children, isAdmin = false }) => {
                   alt=" Logo"
                   className="h-10 w-auto object-contain"
                 />
-                
+
               </div>
               <p className="text-gray-300 mb-4">
                 The largest circulated Telugu daily newspaper, now available digitally.
