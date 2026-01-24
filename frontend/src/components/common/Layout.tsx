@@ -69,7 +69,7 @@ const Layout: React.FC<LayoutProps> = ({ children, isAdmin = false }) => {
           <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-12">
               {/* Left Navigation */}
-              <nav className="flex items-center space-x-2 w-full justify-between sm:justify-start">
+              <nav className="flex items-center space-x-2 w-full sm:w-auto justify-between sm:justify-start">
                 {!isAdmin ? (
                   <>
                     {/* Date Selector with Dropdown */}
@@ -117,12 +117,12 @@ const Layout: React.FC<LayoutProps> = ({ children, isAdmin = false }) => {
                       )}
                     </div>
 
-                    {/* Location - Hidden on small mobile */}
-                    <div className="hidden xs:block px-2 sm:px-3 py-1 bg-gray-100 text-gray-700 rounded text-xs sm:text-sm font-medium">
+                    {/* Location - Hidden on very small mobile only if needed, currently showing to match desktop feeling */}
+                    <div className="hidden sm:block px-2 sm:px-3 py-1 bg-gray-100 text-gray-700 rounded text-xs sm:text-sm font-medium">
                       ANDHRA PRADESH
                     </div>
 
-                    {/* Home - Icon only on mobile */}
+                    {/* Home */}
                     <Link
                       to="/"
                       className="flex items-center space-x-1 px-2 sm:px-3 py-1 text-gray-700 hover:text-telugu-primary hover:bg-gray-100 rounded text-sm"
