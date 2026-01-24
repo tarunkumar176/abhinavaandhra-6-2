@@ -57,7 +57,7 @@ const Layout: React.FC<LayoutProps> = ({ children, isAdmin = false }) => {
                 <img
                   src="/logo.jpg"
                   alt="Telugu E-Paper Logo"
-                  className="h-16 sm:h-24 w-auto object-contain hover:opacity-90 transition-opacity"
+                  className="h-25 w-auto object-contain hover:opacity-90 transition-opacity"
                 />
               </Link>
             </div>
