@@ -197,11 +197,11 @@ const Layout: React.FC<LayoutProps> = ({ children, isAdmin = false }) => {
 
               </div>
               <p className="text-gray-300 mb-4">
-                The largest circulated Telugu daily newspaper, now available digitally.
+                Your favourite regional Telugu daily newspaper, now available digitally.
                 Stay connected with authentic Telugu news and updates.
               </p>
               <p className="text-sm text-gray-400">
-                Bringing you trusted news since decades, now in digital format.
+                Bringing you trusted news since years, now in digital format.
               </p>
             </div>
 
