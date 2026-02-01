@@ -143,9 +143,15 @@ app.use(
 );
 
 // ✅ API Routes
+import authRoutes from './routes/auth.js';
+import paperRoutes from './routes/papers.js';
+import breakingNewsRoutes from './routes/breakingNews.js';
+import contactRoutes from './routes/contact.js';
+
 app.use('/api/auth', authRoutes);
 app.use('/api/papers', paperRoutes);
 app.use('/api/breaking-news', breakingNewsRoutes);
+app.use('/api/contact', contactRoutes);
 
 // ✅ Health Check Route
 app.get('/api/health', (req, res) => {

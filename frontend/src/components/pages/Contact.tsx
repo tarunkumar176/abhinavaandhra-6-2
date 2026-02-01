@@ -31,7 +31,7 @@ const Contact: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.name.trim() || !formData.email.trim() || !formData.message.trim()) {
       toast.error('Please fill in all required fields');
       return;
@@ -104,7 +104,7 @@ const Contact: React.FC = () => {
               If you have any questions, subscription issues, or need support related to the Abhinava Andhra ePaper platform, feel free to reach out to us.
 
             </p>
-            
+
             <div className="space-y-4">
               <div className="flex items-center space-x-3">
                 <div className="bg-telugu-primary/10 p-2 rounded-lg">
@@ -115,17 +115,17 @@ const Contact: React.FC = () => {
                   <p className="text-gray-600">abhinava.andhra.news@gmail.com</p>
                 </div>
               </div>
-              
+
               <div className="flex items-center space-x-3">
                 <div className="bg-telugu-primary/10 p-2 rounded-lg">
                   <Phone className="h-5 w-5 text-telugu-primary" />
                 </div>
                 <div>
                   <p className="font-medium text-gray-900">Phone</p>
-                  <p className="text-gray-600">++91 94938 02010</p>
+                  <p className="text-gray-600">+91 94938 02010</p>
                 </div>
               </div>
-              
+
               <div className="flex items-center space-x-3">
                 <div className="bg-telugu-primary/10 p-2 rounded-lg">
                   <MapPin className="h-5 w-5 text-telugu-primary" />
@@ -133,9 +133,9 @@ const Contact: React.FC = () => {
                 <div>
                   <p className="font-medium text-gray-900">Address</p>
                   <p className="text-gray-600">
-                    Telugu E-Paper Office<br />
-                    Hyderabad, Telangana<br />
-                    India
+                    6-130 1&2, 2nd Floor, 2nd line <br />
+                    Last Bus stop, Ravindra Nagar<br />
+                    Visakhapatnam, Andhra Pradesh - 530040.
                   </p>
                 </div>
               </div>
@@ -164,7 +164,7 @@ const Contact: React.FC = () => {
         {/* Contact Form */}
         <div className="card p-6">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Send us a Message</h2>
-          
+
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">

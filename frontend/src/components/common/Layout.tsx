@@ -48,7 +48,7 @@ const Layout: React.FC<LayoutProps> = ({ children, isAdmin = false }) => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+      <header className="bg-white shadow-sm border-b border-gray-200">
         {/* Top Logo Section - Compact on mobile */}
         <div className="bg-white py-2 sm:py-6">
           <div className="max-w-xl mx-auto px-4 sm:px-6 lg:px-8">
