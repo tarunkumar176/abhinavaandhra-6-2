@@ -128,17 +128,17 @@ const HomePage: React.FC = () => {
         {/* Quick Stats */}
         <div className="grid sm:grid-cols-3 gap-6">
           <div className="bg-white rounded-lg border border-gray-200 p-6">
-            <div className="text-gray-900 font-bold text-lg mb-2">📱 Multi-Device</div>
+            <div className="text-gray-900 font-bold text-lg mb-2">Multi-Device</div>
             <p className="text-gray-600 text-sm">Access on phone, tablet, or computer</p>
           </div>
           
           <div className="bg-white rounded-lg border border-gray-200 p-6">
-            <div className="text-gray-900 font-bold text-lg mb-2">🗂️ Full Archive</div>
+            <div className="text-gray-900 font-bold text-lg mb-2">Full Archive</div>
             <p className="text-gray-600 text-sm">Browse and read past editions anytime</p>
           </div>
           
           <div className="bg-white rounded-lg border border-gray-200 p-6">
-            <div className="text-gray-900 font-bold text-lg mb-2">⚡ Daily Updates</div>
+            <div className="text-gray-900 font-bold text-lg mb-2">Daily Updates</div>
             <p className="text-gray-600 text-sm">Fresh content every morning by 6 AM</p>
           </div>
         </div>
