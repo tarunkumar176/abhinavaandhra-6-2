@@ -26,6 +26,7 @@ import { initializeDatabase } from './config/db.js';
 import authRoutes from './routes/auth.js';
 import paperRoutes from './routes/papers.js';
 import breakingNewsRoutes from './routes/breakingNews.js';
+import contactRoutes from './routes/contact.js';
 import { cleanupOldPapers } from './services/cleanup.js';
 
 const app = express();
@@ -143,10 +144,7 @@ app.use(
 );
 
 // ✅ API Routes
-import authRoutes from './routes/auth.js';
-import paperRoutes from './routes/papers.js';
-import breakingNewsRoutes from './routes/breakingNews.js';
-import contactRoutes from './routes/contact.js';
+
 
 app.use('/api/auth', authRoutes);
 app.use('/api/papers', paperRoutes);
