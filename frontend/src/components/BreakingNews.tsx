@@ -24,7 +24,7 @@ const BreakingNews: React.FC = () => {
 
     return (
         <div className="bg-red-600 text-white h-10 overflow-hidden relative flex items-center w-full">
-            <div className="bg-red-800 px-4 h-full flex items-center z-10 font-bold whitespace-nowrap shadow-md absolute left-0 top-0">
+            <div className="hidden md:flex bg-red-800 px-4 h-full items-center z-10 font-bold whitespace-nowrap shadow-md absolute left-0 top-0">
                 BREAKING NEWS
             </div>
             <div className="w-full overflow-hidden relative h-full flex items-center">
