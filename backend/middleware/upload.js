@@ -30,13 +30,13 @@ const fileFilter = (req, file, cb) => {
     } else {
       cb(new Error('Only PDF files are allowed for the pdf field'), false);
     }
-  } else if (file.fieldname === 'thumbnail') {
+  } else if (file.fieldname === 'thumbnail' || file.fieldname === 'image') {
     // Image file validation
     const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
     if (allowedTypes.includes(file.mimetype)) {
       cb(null, true);
     } else {
-      cb(new Error('Only image files (JPEG, PNG, GIF, WebP) are allowed for the thumbnail field'), false);
+      cb(new Error(`Only image files (JPEG, PNG, GIF, WebP) are allowed for the ${file.fieldname} field`), false);
     }
   } else {
     cb(new Error('Unknown file field'), false);
@@ -80,7 +80,7 @@ export const handleUploadError = (error, req, res, next) => {
   if (error?.message?.includes('Only image files')) {
     return res.status(400).json({
       success: false,
-      message: 'Only image files (JPEG, PNG, GIF, WebP) are allowed for the thumbnail.',
+      message: 'Only image files (JPEG, PNG, GIF, WebP) are allowed for the thumbnail/image.',
     });
   }
 
