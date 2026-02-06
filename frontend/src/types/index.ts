@@ -10,6 +10,8 @@ export interface Paper {
     createdAt: string;
     updatedAt: string;
     thumbnailUrl: string | null;
+    pages?: { highQuality: string; standard: string; thumbnail: string }[];
+    processingStatus?: 'pending' | 'processing' | 'completed' | 'failed';
 }
 
 export interface User {

@@ -27,121 +27,13 @@ import authRoutes from './routes/auth.js';
 import paperRoutes from './routes/papers.js';
 import breakingNewsRoutes from './routes/breakingNews.js';
 import contactRoutes from './routes/contact.js';
+import adsRoutes from './routes/ads.js';
 import { cleanupOldPapers } from './services/cleanup.js';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// ✅ Helmet Security (Render + PDF iframe safe)
-app.use(
-  helmet({
-    crossOriginResourcePolicy: { policy: 'cross-origin' },
-    frameguard: false,
-    contentSecurityPolicy: {
-      directives: {
-        defaultSrc: ["'self'"],
-        frameSrc: [
-          "'self'",
-          "http://localhost:3000",
-          "https://epaper-page.onrender.com",
-          "https://epaper-front.onrender.com",
-          "https://epaper-1bys-87jk49mvu-vamsi-naidu7s-projects.vercel.app",
-          "https://epaper-mauve.vercel.app",
-          "https://epaper-7o2a.onrender.com",
-          "https://epaper-1bys.vercel.app",
-          "https://epaper-1bys-awla4qbc5-vamsi-naidu7s-projects.vercel.app",
-          "https://www.abhinavaandhra.com",
-          "https://abhinavaandhra.com"
-        ],
-        frameAncestors: [
-          "'self'",
-          "http://localhost:3000",
-          "https://epaper-page.onrender.com",
-          "https://epaper-front.onrender.com",
-          "https://epaper-1bys-87jk49mvu-vamsi-naidu7s-projects.vercel.app",
-          "https://epaper-mauve.vercel.app",
-          "https://epaper-7o2a.onrender.com"
-        ],
-        imgSrc: [
-          "'self'",
-          "data:",
-          "https://epaper-page.onrender.com",
-          "https://epaper-front.onrender.com",
-          "https://epaper-1bys-87jk49mvu-vamsi-naidu7s-projects.vercel.app",
-          "https://epaper-mauve.vercel.app",
-          "https://epaper-7o2a.onrender.com"
-        ],
-        scriptSrc: ["'self'"],
-        styleSrc: ["'self'", "'unsafe-inline'", "https:"]
-      }
-    }
-  })
-);
-
-// ✅ Rate Limiter
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100,
-  message: 'Too many requests, please try again later.'
-});
-app.use('/api/', limiter);
-
-// ✅ CORS
-app.use(
-  cors({
-    origin: [
-      'http://localhost:3000',
-      'https://epapera0.vercel.app',
-      'https://epaper-front.onrender.com',
-      'https://epaper-1bys-87jk49mvu-vamsi-naidu7s-projects.vercel.app',
-      'https://epaper-mauve.vercel.app',
-      'https://epaper-1bys.vercel.app',
-      'https://epaper-1bys-awla4qbc5-vamsi-naidu7s-projects.vercel.app',
-      'https://www.abhinavaandhra.com',
-      'https://abhinavaandhra.com',
-      process.env.FRONTEND_URL
-    ].filter(Boolean),
-    credentials: true
-  })
-);
-
-// ✅ Body Parsers
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-
-// ✅ Ensure uploads folder exists
-const uploadsDir = path.join(__dirname, process.env.UPLOAD_DIR || 'uploads');
-await fs.ensureDir(uploadsDir);
-
-// ✅ Serve uploaded files with proper CORS headers
-app.use(
-  '/uploads',
-  (req, res, next) => {
-    const allowedOrigins = [
-      'http://localhost:3000',
-      'https://epaper-page.onrender.com',
-      'https://epaper-front.onrender.com',
-      'https://epaper-1bys-87jk49mvu-vamsi-naidu7s-projects.vercel.app',
-      'https://epaper-mauve.vercel.app',
-      'https://epaper-1bys.vercel.app',
-      'https://epaper-1bys-awla4qbc5-vamsi-naidu7s-projects.vercel.app',
-      'https://www.abhinavaandhra.com',
-      'https://abhinavaandhra.com',
-      process.env.FRONTEND_URL
-    ].filter(Boolean);
-
-    const origin = req.headers.origin;
-    if (allowedOrigins.includes(origin)) {
-      res.header('Access-Control-Allow-Origin', origin);
-    }
-
-    res.header('Access-Control-Allow-Methods', 'GET');
-    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-    res.header('Cross-Origin-Resource-Policy', 'cross-origin');
-    next();
-  },
-  express.static(uploadsDir)
-);
+// ... (existing code)
 
 // ✅ API Routes
 
@@ -149,6 +41,7 @@ app.use(
 app.use('/api/auth', authRoutes);
 app.use('/api/papers', paperRoutes);
 app.use('/api/breaking-news', breakingNewsRoutes);
+app.use('/api/ads', adsRoutes);
 app.use('/api/contact', contactRoutes);
 
 // ✅ Health Check Route

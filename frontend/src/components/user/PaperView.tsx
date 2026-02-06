@@ -16,10 +16,11 @@ import Cropper from 'react-cropper';
 import 'cropperjs/dist/cropper.css';
 
 import { Paper } from '../../../types';
-import { paperAPI } from '../../services/api';
+import { paperAPI, adsAPI, Ad } from '../../services/api';
 import { formatDisplayDate, getRecentDates, formatLongDate } from '../../utils/dateUtils';
 import { addWatermarkToImage, downloadImage } from '../../utils/imageUtils';
 import toast from 'react-hot-toast';
+import PopupAd from './PopupAd';
 
 
 const PaperView: React.FC = () => {
@@ -32,6 +33,11 @@ const PaperView: React.FC = () => {
   const [pdfLoading, setPdfLoading] = useState(false);
   const [cropMode, setCropMode] = useState(false);
   const [totalPages, setTotalPages] = useState(0);
+
+  // Ad State
+  const [activeAd, setActiveAd] = useState<Ad | null>(null);
+  const [showAd, setShowAd] = useState(false);
+
   const cropperRef = React.useRef<any>(null);
   const imageRef = React.useRef<HTMLImageElement>(null);
 
@@ -42,36 +48,69 @@ const PaperView: React.FC = () => {
 
   useEffect(() => {
     if (date) {
-      fetchPaper(date);
+      // Parallel fetch: Paper + Ad
+      setLoading(true);
+
+      const loadData = async () => {
+        try {
+          // 1. Fetch Ad (Non-blocking for paper fetch, but we set state)
+          try {
+            const adRes = await adsAPI.getActive();
+            if (adRes.success && adRes.data && adRes.data.is_active) {
+              console.log('📺 Active ad found:', adRes.data);
+              setActiveAd(adRes.data);
+              setShowAd(true);
+            }
+          } catch (err) {
+            console.warn('Failed to fetch ads:', err);
+          }
+
+          // 2. Fetch Paper (Main Content)
+          await fetchPaper(date);
+
+        } catch (err) {
+          console.error(err);
+        } finally {
+          // Loading state for PaperView is handled by fetchPaper logic partially
+          // But we need to ensure main loading spinner is off
+          // The fetchPaper function sets loading(false) at end
+        }
+      };
+
+      loadData();
     }
   }, [date]);
 
   const fetchPaper = async (paperDate: string) => {
     try {
-      setLoading(true);
+      // setLoading(true); // Already set in the wrapper
 
       // First get basic paper info
       const paperResponse = await paperAPI.getByDate(paperDate);
       if (paperResponse.success && paperResponse.data) {
         setPaper(paperResponse.data);
 
+        // ... (rest of logic)
+
         // Check if we have pre-processed pages (server-side processing)
         if (paperResponse.data.pages && paperResponse.data.pages.length > 0) {
+          // ... logic
+          // Copy of existing logic
           console.log('✅ Using pre-processed server images');
           const images = paperResponse.data.pages.map(p => p.highQuality);
           setPageImages(images);
           setTotalPages(images.length);
-          // Set current page to 0 if not already
           setCurrentPage(0);
         } else {
           console.log('⚠️ No server images found, falling back to client-side rendering');
-          // Fallback: use the original PDF with optimized PDF.js rendering
           await renderPdfToImages(paperResponse.data.pdfUrl);
         }
+
       } else {
         toast.error('Paper not found for this date');
       }
     } catch (error) {
+      // ... existing error handling
       toast.error('Failed to fetch paper');
       console.error(error);
     } finally {
@@ -297,7 +336,17 @@ const PaperView: React.FC = () => {
   }
 
   return (
-    <div className="space-y-4 sm:space-y-6">
+    <div className="space-y-4 sm:space-y-6 relative">
+      {/* Advertisement Popup Overlay */}
+      {showAd && activeAd && (
+        <PopupAd
+          imageUrl={activeAd.image_url}
+          linkUrl={activeAd.link_url}
+          duration={5}
+          onClose={() => setShowAd(false)}
+        />
+      )}
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 md:gap-6">
         <div className="flex-1 min-w-0">

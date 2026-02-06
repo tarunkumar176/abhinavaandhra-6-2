@@ -58,6 +58,17 @@ export async function initializeDatabase() {
     )
   `);
 
+  await db.exec(`
+    CREATE TABLE IF NOT EXISTS ads (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      image_url TEXT NOT NULL,
+      link_url TEXT,
+      is_active BOOLEAN DEFAULT 1,
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+      updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
   // Migration: Add new columns if they don't exist
   try {
     const tableInfo = await db.all('PRAGMA table_info(papers)');

@@ -16,12 +16,13 @@ export interface Paper {
 }
 
 export interface PageData {
-  pageNumber: number;
+  pageNumber?: number;
   highQuality: string;
-  mediumQuality: string;
+  standard?: string;
+  mediumQuality?: string;
   thumbnail: string;
-  width: number;
-  height: number;
+  width?: number;
+  height?: number;
 }
 
 export interface User {

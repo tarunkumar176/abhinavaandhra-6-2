@@ -227,4 +227,45 @@ export const contactAPI = {
   },
 };
 
+export interface Ad {
+  id: number;
+  image_url: string;
+  link_url?: string;
+  is_active: boolean;
+  created_at: string;
+}
+
+export const adsAPI = {
+  getActive: async (): Promise<ApiResponse<Ad | null>> => {
+    const response = await api.get('/ads/active');
+    return response.data;
+  },
+
+  getAll: async (): Promise<ApiResponse<Ad[]>> => {
+    const response = await api.get('/ads');
+    return response.data;
+  },
+
+  create: async (file: File, link_url?: string): Promise<ApiResponse<Ad>> => {
+    const formData = new FormData();
+    formData.append('image', file);
+    if (link_url) formData.append('link_url', link_url);
+
+    const response = await api.post('/ads', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return response.data;
+  },
+
+  toggle: async (id: number): Promise<ApiResponse<Ad>> => {
+    const response = await api.put(`/ads/${id}/toggle`);
+    return response.data;
+  },
+
+  delete: async (id: number): Promise<ApiResponse<void>> => {
+    const response = await api.delete(`/ads/${id}`);
+    return response.data;
+  },
+};
+
 export default api;

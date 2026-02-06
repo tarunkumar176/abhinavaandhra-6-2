@@ -10,19 +10,19 @@ const { Pool } = pg;
 export const pool = new Pool(
   process.env.DATABASE_URL
     ? {
-        connectionString: process.env.DATABASE_URL,
-        ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
-      }
+      connectionString: process.env.DATABASE_URL,
+      ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+    }
     : {
-        host: process.env.DB_HOST || 'localhost',
-        port: process.env.DB_PORT || 5432,
-        database: process.env.DB_NAME || 'telugu_epaper',
-        user: process.env.DB_USER || 'postgres',
-        password: process.env.DB_PASSWORD,
-        max: 20,
-        idleTimeoutMillis: 30000,
-        connectionTimeoutMillis: 2000,
-      }
+      host: process.env.DB_HOST || 'localhost',
+      port: process.env.DB_PORT || 5432,
+      database: process.env.DB_NAME || 'telugu_epaper',
+      user: process.env.DB_USER || 'postgres',
+      password: process.env.DB_PASSWORD,
+      max: 20,
+      idleTimeoutMillis: 30000,
+      connectionTimeoutMillis: 2000,
+    }
 );
 
 // Test database connection
@@ -37,7 +37,7 @@ pool.on('error', (err) => {
 // Initialize database tables and default admin user
 export async function initializeDatabase() {
   const client = await pool.connect();
-  
+
   try {
     // Create users table
     await client.query(`
@@ -82,11 +82,23 @@ export async function initializeDatabase() {
       )
     `);
 
+    // Create ads table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS ads (
+        id SERIAL PRIMARY KEY,
+        image_url TEXT NOT NULL,
+        link_url TEXT,
+        is_active BOOLEAN DEFAULT true,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
     // Create indexes for better performance
     await client.query(`
       CREATE INDEX IF NOT EXISTS idx_papers_date ON papers(date DESC);
     `);
-    
+
     await client.query(`
       CREATE INDEX IF NOT EXISTS idx_papers_created_at ON papers(created_at DESC);
     `);
@@ -94,7 +106,7 @@ export async function initializeDatabase() {
     // Create default admin user if it doesn't exist
     const adminEmail = process.env.ADMIN_EMAIL || 'admin@teluguepaper.com';
     const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
-    
+
     const existingAdmin = await client.query(
       'SELECT id FROM users WHERE email = $1',
       [adminEmail]
@@ -121,18 +133,18 @@ export async function initializeDatabase() {
 // Helper function to execute queries - converts SQLite syntax to PostgreSQL
 export async function query(text, params = []) {
   const start = Date.now();
-  
+
   // Convert SQLite ? placeholders to PostgreSQL $1, $2, etc.
   let paramIndex = 1;
   const convertedText = text.replace(/\?/g, () => '$' + (paramIndex++));
-  
+
   const res = await pool.query(convertedText, params);
   const duration = Date.now() - start;
-  
+
   if (process.env.NODE_ENV === 'development') {
     console.log('Executed query', { text: convertedText, duration, rows: res.rowCount });
   }
-  
+
   // Return in SQLite-compatible format
   return {
     rows: res.rows,
