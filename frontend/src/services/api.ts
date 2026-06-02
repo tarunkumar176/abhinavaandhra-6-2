@@ -3,7 +3,7 @@ import { Paper, User, ApiResponse, UploadProgress } from '../types';
 
 // ✅ Force API URL to always end with /api (Fixes Vercel 404s)
 const getApiUrl = () => {
-  let url = import.meta.env.VITE_API_URL || 'https://epaper-7o2a.onrender.com/api';
+  let url = import.meta.env.VITE_API_URL || 'https://abhinavaandhra-6-2-t9mf.onrender.com/api';
   if (!url.endsWith('/api')) {
     url += '/api';
   }
