@@ -11,7 +11,7 @@ export default defineConfig(({ mode }) => {
       historyApiFallback: true,
       proxy: {
         '/uploads': {
-          target: 'https://epaper-7o2a.onrender.com',
+          target: 'https://abhinavaandhra-6-2-t9mf.onrender.com',
           changeOrigin: true,
         }
       }
